@@ -1,13 +1,14 @@
 package full.stack.back.service;
 
 import full.stack.back.dto.SessaoVotacaoRequestDTO;
-import full.stack.back.entity.SessaoVotacao;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
+import full.stack.back.dto.SessaoVotacaoResponseDTO;
 
-@Service
+import java.util.List;
+
 public interface SessaoVotacaoService {
-
-    SessaoVotacao abrirSessao(@Valid SessaoVotacaoRequestDTO dto);
-
+    SessaoVotacaoResponseDTO abrirSessao(SessaoVotacaoRequestDTO dto);
+    SessaoVotacaoResponseDTO buscarSessao(Long id);
+    List<SessaoVotacaoResponseDTO> listarSessoes();
+    SessaoVotacaoResponseDTO atualizarSessao(Long id, SessaoVotacaoRequestDTO dto);
+    void deletarSessao(Long id);
 }

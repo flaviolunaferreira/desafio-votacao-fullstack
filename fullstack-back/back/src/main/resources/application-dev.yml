@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+spring:
+  datasource:
+    name: back
+    url: jdbc:mysql://localhost:3306/cooperative_voting?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: chacal3012
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    org.springframework: DEBUG
+    org.springdoc: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.springframework.web: DEBUG
+    com.fasterxml.jackson: DEBUG

@@ -2,14 +2,15 @@ package full.stack.back.service;
 
 import full.stack.back.dto.ResultadoResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
-import full.stack.back.entity.Voto;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
+import full.stack.back.dto.VotoResponseDTO;
 
-@Service
+import java.util.List;
+
 public interface VotoService {
-
-    Voto votar(@Valid VotoRequestDTO votoDTO);
+    VotoResponseDTO votar(VotoRequestDTO votoDTO);
+    VotoResponseDTO buscarVoto(Long id);
+    List<VotoResponseDTO> listarVotos(Long pautaId);
+    VotoResponseDTO atualizarVoto(Long id, VotoRequestDTO votoDTO);
+    void deletarVoto(Long id);
     ResultadoResponseDTO obterResultado(Long pautaId);
-
 }

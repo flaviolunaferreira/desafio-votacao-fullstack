@@ -1,16 +1,14 @@
 package full.stack.back.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
 public class SessaoVotacaoRequestDTO {
-
-    @NotNull(message = "O ID da pauta é obrigatório.")
+    @NotNull(message = "O ID da pauta é obrigatório")
     private Long pautaId;
 
-    @Min(value = 60, message = "A duração deve ser de pelo menos 1 hora.")
-    private Integer duracaoMinutos;
-
+    @Positive(message = "A duração deve ser um número positivo")
+    private Integer duracao; // Em minutos
 }

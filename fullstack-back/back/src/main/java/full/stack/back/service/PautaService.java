@@ -1,13 +1,14 @@
 package full.stack.back.service;
 
 import full.stack.back.dto.PautaRequestDTO;
-import full.stack.back.entity.Pauta;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Service;
+import full.stack.back.dto.PautaResponseDTO;
 
-@Service
+import java.util.List;
+
 public interface PautaService {
-
-    Pauta criarPauta(@Valid PautaRequestDTO pautaDTO);
-    Pauta buscarPauta(Long id);
+    PautaResponseDTO criarPauta(PautaRequestDTO pautaDTO);
+    PautaResponseDTO buscarPauta(Long id);
+    List<PautaResponseDTO> listarPautas();
+    PautaResponseDTO atualizarPauta(Long id, PautaRequestDTO pautaDTO);
+    void deletarPauta(Long id);
 }
