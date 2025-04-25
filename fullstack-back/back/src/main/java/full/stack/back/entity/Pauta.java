@@ -22,4 +22,12 @@ public class Pauta {
     @NotBlank(message = "A descrição da pauta é obrigatória")
     private String descricao;
 
+    public Pauta(String titulo, String descricao) {
+        this.titulo = titulo;
+        this.descricao = descricao;
+    }
+
+    public Pauta() {
+
+    }
 }

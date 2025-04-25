@@ -11,7 +11,6 @@ import full.stack.back.exception.ResourceNotFoundException;
 import full.stack.back.repository.PautaRepository;
 import full.stack.back.repository.SessaoVotacaoRepository;
 import full.stack.back.repository.VotoRepository;
-import full.stack.back.service.impl.VotoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
