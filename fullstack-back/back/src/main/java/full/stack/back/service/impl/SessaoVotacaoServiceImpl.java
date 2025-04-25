@@ -1,4 +1,4 @@
-package full.stack.back.service;
+package full.stack.back.service.impl;
 
 import full.stack.back.dto.SessaoVotacaoRequestDTO;
 import full.stack.back.dto.SessaoVotacaoResponseDTO;
@@ -8,6 +8,7 @@ import full.stack.back.exception.BusinessException;
 import full.stack.back.exception.ResourceNotFoundException;
 import full.stack.back.repository.PautaRepository;
 import full.stack.back.repository.SessaoVotacaoRepository;
+import full.stack.back.service.SessaoVotacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -25,19 +26,24 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     private final PautaRepository pautaRepository;
 
     @Override
-    public SessaoVotacaoResponseDTO abrirSessao(SessaoVotacaoRequestDTO dto) {
-        Pauta pauta = pautaRepository.findById(dto.getPautaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + dto.getPautaId()));
+    public SessaoVotacaoResponseDTO abrirSessao(SessaoVotacaoRequestDTO requestDTO) {
+        Pauta pauta = pautaRepository.findById(requestDTO.getPautaId())
+                .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + requestDTO.getPautaId()));
 
-        // Verifica se já existe uma sessão aberta para a pauta
-        if (sessaoVotacaoRepository.existsByPautaId(dto.getPautaId())) {
-            throw new BusinessException("Sessão de votação já existe para a pauta: " + dto.getPautaId());
+        if (sessaoVotacaoRepository.findByPautaId(requestDTO.getPautaId()) != null) {
+            throw new BusinessException("Já existe uma sessão de votação aberta para a pauta: " + requestDTO.getPautaId());
         }
+
+        LocalDateTime dataAbertura = LocalDateTime.now();
+        LocalDateTime dataFechamento = requestDTO.getDuracao() != null && requestDTO.getDuracao() > 0
+                ? dataAbertura.plusMinutes(requestDTO.getDuracao())
+                : dataAbertura.plusMinutes(1);
 
         SessaoVotacao sessao = new SessaoVotacao();
         sessao.setPauta(pauta);
-        sessao.setDataAbertura(LocalDateTime.now());
-        sessao.setDataFechamento(calculateDataFechamento(dto.getDuracao()));
+        sessao.setDataAbertura(dataAbertura);
+        sessao.setDataFechamento(dataFechamento);
+
         sessao = sessaoVotacaoRepository.save(sessao);
         return toResponseDTO(sessao);
     }
