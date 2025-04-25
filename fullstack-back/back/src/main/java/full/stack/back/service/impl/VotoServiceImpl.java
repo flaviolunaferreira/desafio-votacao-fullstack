@@ -12,6 +12,7 @@ import full.stack.back.repository.PautaRepository;
 import full.stack.back.repository.SessaoVotacaoRepository;
 import full.stack.back.repository.VotoRepository;
 import full.stack.back.service.VotoService;
+import full.stack.back.util.CpfValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +32,11 @@ public class VotoServiceImpl implements VotoService {
 
     @Override
     public VotoResponseDTO votar(VotoRequestDTO votoDTO) {
+        // Validar CPF
+        if (!CpfValidation.isValid(votoDTO.getCpf())) {
+            throw new BusinessException("CPF inválido: " + votoDTO.getCpf());
+        }
+
         Pauta pauta = pautaRepository.findById(votoDTO.getPautaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + votoDTO.getPautaId()));
 
@@ -43,22 +49,15 @@ public class VotoServiceImpl implements VotoService {
             throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getPautaId());
         }
 
-        // Validação simples de CPF (supondo que seja um número longo para associadoId)
-        Long associadoId;
-        try {
-            associadoId = Long.valueOf(votoDTO.getCpf());
-        } catch (NumberFormatException e) {
-            throw new BusinessException("CPF inválido: " + votoDTO.getCpf());
-        }
-
-        if (votoRepository.existsByPautaIdAndAssociadoId(votoDTO.getPautaId(), associadoId)) {
-            throw new BusinessException("Associado já votou na pauta: " + votoDTO.getPautaId());
+        if (votoRepository.existsByPautaIdAndAssociadoCpf(votoDTO.getPautaId(), votoDTO.getCpf())) {
+            throw new BusinessException("Associado com CPF " + votoDTO.getCpf() + " já votou na pauta: " + votoDTO.getPautaId());
         }
 
         Voto voto = new Voto();
         voto.setPauta(pauta);
-        voto.setAssociadoId(associadoId);
+        voto.setAssociadoCpf(votoDTO.getCpf());
         voto.setVoto(votoDTO.getVoto());
+        voto.setDataVoto(LocalDateTime.now());
         voto = votoRepository.save(voto);
         return toResponseDTO(voto);
     }
@@ -78,7 +77,7 @@ public class VotoServiceImpl implements VotoService {
                     .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + pautaId));
             votos = votoRepository.findByPautaId(pautaId);
         } else {
-            votos = (List<Voto>) votoRepository.findAll();
+            votos = votoRepository.findAll();
         }
         return votos.stream()
                 .map(this::toResponseDTO)
@@ -89,6 +88,11 @@ public class VotoServiceImpl implements VotoService {
     public VotoResponseDTO atualizarVoto(Long id, VotoRequestDTO votoDTO) {
         Voto voto = votoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Voto não encontrado: " + id));
+
+        // Validar CPF
+        if (!CpfValidation.isValid(votoDTO.getCpf())) {
+            throw new BusinessException("CPF inválido: " + votoDTO.getCpf());
+        }
 
         Pauta pauta = pautaRepository.findById(votoDTO.getPautaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + votoDTO.getPautaId()));
@@ -102,16 +106,10 @@ public class VotoServiceImpl implements VotoService {
             throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getPautaId());
         }
 
-        Long associadoId;
-        try {
-            associadoId = Long.valueOf(votoDTO.getCpf());
-        } catch (NumberFormatException e) {
-            throw new BusinessException("CPF inválido: " + votoDTO.getCpf());
-        }
-
         voto.setPauta(pauta);
-        voto.setAssociadoId(associadoId);
+        voto.setAssociadoCpf(votoDTO.getCpf());
         voto.setVoto(votoDTO.getVoto());
+        voto.setDataVoto(LocalDateTime.now());
         voto = votoRepository.save(voto);
         return toResponseDTO(voto);
     }
@@ -146,7 +144,7 @@ public class VotoServiceImpl implements VotoService {
         VotoResponseDTO dto = new VotoResponseDTO();
         dto.setId(voto.getId());
         dto.setPautaId(voto.getPauta().getId());
-        dto.setAssociadoId(voto.getAssociadoId());
+        dto.setAssociadoCpf(voto.getAssociadoCpf());
         dto.setVoto(voto.getVoto());
         return dto;
     }

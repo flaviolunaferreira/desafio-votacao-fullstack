@@ -37,7 +37,7 @@ public class VotoController {
                                     @ExampleObject(name = "Validação", value = "{\"message\": \"pautaId: O ID da pauta é obrigatório; cpf: O CPF do associado é obrigatório; voto: O voto (Sim/Não) é obrigatório\"}"),
                                     @ExampleObject(name = "Sessão encerrada", value = "{\"message\": \"Sessão de votação encerrada para a pauta: 1\"}"),
                                     @ExampleObject(name = "CPF inválido", value = "{\"message\": \"CPF inválido: 12345678900\"}"),
-                                    @ExampleObject(name = "Associado já votou", value = "{\"message\": \"Associado já votou na pauta: 1\"}")
+                                    @ExampleObject(name = "Associado já votou", value = "{\"message\": \"Associado com CPF 12345678901 já votou na pauta: 1\"}")
                             })),
             @ApiResponse(responseCode = "404", description = "Pauta não encontrada",
                     content = @Content(mediaType = "application/json",

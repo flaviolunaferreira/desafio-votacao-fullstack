@@ -6,6 +6,6 @@ import lombok.Data;
 public class VotoResponseDTO {
     private Long id;
     private Long pautaId;
-    private Long associadoId;
+    private String associadoCpf; // Alterado de Long associadoId
     private Boolean voto; // true = Sim, false = Não
 }
