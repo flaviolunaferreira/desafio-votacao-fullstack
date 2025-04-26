@@ -1,39 +1,21 @@
 package full.stack.back.util;
 
 public class CpfValidation {
-
     public static boolean isValid(String cpf) {
-        // Remove caracteres não numéricos
         cpf = cpf.replaceAll("[^0-9]", "");
-
-        // Verifica tamanho
-        if (cpf.length() != 11) {
-            return false;
-        }
-
-        // Verifica se todos os dígitos são iguais
-        if (cpf.matches("(\\d)\\1{10}")) {
-            return false;
-        }
-
-        // Validação dos dígitos verificadores
-        try {
-            int[] digits = cpf.chars().map(c -> c - '0').toArray();
-            return isValidDigit(digits, 9) && isValidDigit(digits, 10);
-        } catch (Exception e) {
-            return false;
-        }
+        if (cpf.length() != 11) return false;
+        if (cpf.matches("(\\d)\\1{10}")) return false;
+        int[] digits = cpf.chars().map(c -> c - '0').toArray();
+        return validateDigit(digits, 9) && validateDigit(digits, 10);
     }
 
-    private static boolean isValidDigit(int[] digits, int position) {
+    private static boolean validateDigit(int[] digits, int pos) {
         int sum = 0;
-        int weight = position + 1;
-        for (int i = 0; i < position; i++) {
-            sum += digits[i] * weight--;
+        for (int i = 0; i < pos; i++) {
+            sum += digits[i] * (pos + 1 - i);
         }
-        int remainder = sum % 11;
-        int expectedDigit = remainder < 2 ? 0 : 11 - remainder;
-        return digits[position] == expectedDigit;
+        int mod = sum % 11;
+        int digit = mod < 2 ? 0 : 11 - mod;
+        return digit == digits[pos];
     }
-
 }

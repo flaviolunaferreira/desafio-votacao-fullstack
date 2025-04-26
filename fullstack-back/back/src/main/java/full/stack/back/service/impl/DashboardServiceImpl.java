@@ -3,7 +3,6 @@ package full.stack.back.service.impl;
 import full.stack.back.dto.DashboardResumoDTO;
 import full.stack.back.dto.ParticipacaoSessaoDTO;
 import full.stack.back.dto.TendenciaVotosDTO;
-import full.stack.back.entity.Pauta;
 import full.stack.back.entity.SessaoVotacao;
 import full.stack.back.exception.BusinessException;
 import full.stack.back.repository.PautaRepository;
@@ -56,8 +55,9 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // Pautas recentes (últimas 5)
-        List<Pauta> pautasRecentes = pautaRepository.findAllByOrderByIdDesc(PageRequest.of(0, 5));
-        resumo.setPautasRecentes(pautasRecentes.stream()
+        List<DashboardResumoDTO.PautaResumoDTO> pautasRecentes = pautaRepository.findAllByOrderByIdDesc(PageRequest.of(0, 10))
+                .getContent()
+                .stream()
                 .map(pauta -> {
                     DashboardResumoDTO.PautaResumoDTO dto = new DashboardResumoDTO.PautaResumoDTO();
                     dto.setId(pauta.getId());
@@ -65,7 +65,7 @@ public class DashboardServiceImpl implements DashboardService {
                     dto.setTotalVotos(votoRepository.countByPautaId(pauta.getId()));
                     return dto;
                 })
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
 
         // Sessões ativas
         List<SessaoVotacao> sessoesAtivas = sessaoVotacaoRepository.findByDataFechamentoAfter(LocalDateTime.now());
