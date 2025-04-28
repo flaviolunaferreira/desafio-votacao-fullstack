@@ -1,0 +1,172 @@
+@use 'sass:color';
+
+$primary-blue: #007acc;
+$background-dark: #1e1e1e;
+$text-light: #ffffff;
+$input-bg: #2d2d2d;
+$border-color: #444;
+$header-color: #333;
+$error-color: #ff4444;
+
+.dashboard-container {
+  background: $background-dark;
+  color: $text-light;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: $text-light;
+}
+
+.error-message {
+  color: $error-color;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: $text-light;
+}
+
+.resumo-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  padding: 15px;
+  background: $input-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: $text-light;
+}
+
+.card p {
+  font-size: 22px;
+  color: $primary-blue;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.section h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: $text-light;
+}
+
+.filter-section {
+  background: $input-bg;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.filter-form {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: $text-light;
+}
+
+.form-group select {
+  padding: 8px;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: $text-light;
+  font-size: 14px;
+}
+
+.chart-section {
+  background: $input-bg;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  max-width: 100%;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $input-bg;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 12px;
+  border: 1px solid $border-color;
+  text-align: left;
+  color: $text-light;
+  font-size: 14px;
+}
+
+.dashboard-table th {
+  background-color: $header-color;
+  font-weight: bold;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: $text-light;
+}
+
+@media (max-width: 768px) {
+  .resumo-section {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-group {
+    min-width: 100%;
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}

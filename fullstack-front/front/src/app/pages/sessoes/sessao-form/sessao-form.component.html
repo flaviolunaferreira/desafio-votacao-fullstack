@@ -1,0 +1,10 @@
+<div class="sessao-form container-dark">
+  <app-dynamic-crud
+    [config]="config"
+    [initialData]="[sessao]"
+    [isLoading]="isLoading"
+    [error]="error"
+    (onCreate)="saveSessao($event)"
+    (onUpdate)="saveSessao($event.data)"
+  ></app-dynamic-crud>
+</div>

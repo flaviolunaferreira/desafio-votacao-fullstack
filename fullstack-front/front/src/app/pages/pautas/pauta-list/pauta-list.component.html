@@ -1,0 +1,13 @@
+<!-- src/app/pages/pautas/pauta-list/pauta-list.component.html -->
+<app-dynamic-crud
+  [config]="config"
+  [initialData]="pautas"
+  [isLoading]="isLoading"
+  [error]="error"
+  (onCreate)="createPauta($event)"
+  (onUpdate)="updatePauta($event)"
+  (onRemove)="deletePauta($event)"
+  (onLoadData)="loadPautas()"
+  (onView)="viewPauta($event)"
+>
+</app-dynamic-crud>

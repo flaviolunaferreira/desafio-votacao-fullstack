@@ -1,0 +1,154 @@
+@use 'sass:color';
+
+$primary-blue: #007acc; // Mantido para color.adjust
+
+.dynamic-crud-container {
+  background: var(--background-dark);
+  color: var(--text-light);
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: var(--text-light);
+}
+
+.notification {
+  background: #28a745;
+  color: var(--text-light);
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
+}
+
+.toggle-form-btn {
+  background-color: var(--primary-blue);
+  color: var(--text-light);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.toggle-form-btn:hover {
+  background-color: color.adjust($primary-blue, $lightness: -10%);
+}
+
+.crud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-field label {
+  font-weight: bold;
+  color: var(--text-light);
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text-light);
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.25rem rgba(0, 122, 204, 0.25);
+}
+
+.form-field input:disabled,
+.form-field textarea:disabled,
+.form-field select:disabled {
+  background-color: #f5f5f5;
+}
+
+.form-field .error {
+  color: var(--error-color);
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-field input {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--text-light);
+}
+
+.crud-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--input-bg);
+}
+
+.crud-table th,
+.crud-table td {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  color: var(--text-light);
+}
+
+.crud-table th {
+  background-color: var(--header-color);
+  font-weight: bold;
+}
+
+.crud-table button {
+  margin-right: 5px;
+}
+
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
+}

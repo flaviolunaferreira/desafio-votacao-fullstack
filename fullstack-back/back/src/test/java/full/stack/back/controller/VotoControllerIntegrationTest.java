@@ -67,7 +67,7 @@ class VotoControllerIntegrationTest {
         sessao = sessaoVotacaoRepository.save(sessao);
 
         requestDTO = new VotoRequestDTO();
-        requestDTO.setPautaId(pauta.getId());
+        requestDTO.setSessaoId(sessao.getId());
         requestDTO.setCpf("11144477735");
         requestDTO.setVoto(true);
     }
@@ -86,7 +86,7 @@ class VotoControllerIntegrationTest {
 
     @Test
     void votar_pautaIdNulo_retorna400() throws Exception {
-        requestDTO.setPautaId(null);
+        requestDTO.setSessaoId(null);
         mockMvc.perform(post("/api/v1/votos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
@@ -127,7 +127,7 @@ class VotoControllerIntegrationTest {
 
     @Test
     void votar_pautaNaoExistente_retorna404() throws Exception {
-        requestDTO.setPautaId(999L);
+        requestDTO.setSessaoId(999L);
         mockMvc.perform(post("/api/v1/votos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))

@@ -1,0 +1,13 @@
+/* src/app/pages/sessoes/sessao-list/sessao-list.component.scss */
+:host {
+  display: block;
+  padding: 20px;
+  background: var(--background-dark);
+  color: var(--text-light);
+}
+
+app-dynamic-crud {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}

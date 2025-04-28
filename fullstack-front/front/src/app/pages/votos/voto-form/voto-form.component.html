@@ -1,0 +1,46 @@
+<div class="votacao-container">
+  <!-- Modal CPF -->
+  <div class="modal" *ngIf="showCpfModal">
+    <div class="modal-content">
+      <h2>Informe seu CPF</h2>
+      <input type="text" [(ngModel)]="cpf" placeholder="Digite seu CPF" maxlength="11" />
+      <p class="error" *ngIf="cpfError">{{ cpfError }}</p>
+      <button (click)="validarCpf()">Validar</button>
+    </div>
+  </div>
+
+  <!-- Tabela de Sessões -->
+  <div class="sessoes-table" *ngIf="!showCpfModal">
+    <table>
+      <thead>
+      <tr>
+        <th>ID Sessão</th>
+        <th>Título da Pauta</th>
+        <th>Data Início</th>
+        <th>Data Fim</th>
+        <th>Tempo Restante</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let sessao of sessoes; let i = index" [ngClass]="{'active': i === 0}">
+        <td>{{ sessao.id }}</td>
+        <td>{{ sessao.pautaTitulo }}</td>
+        <td>{{ sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td [ngStyle]="{'color': getTempoRestanteColor(timers[sessao.id], sessao.dataFim)}">
+          {{ timers[sessao.id] || 'Calculando...' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Opções de Votação -->
+    <div class="votacao-opcoes" *ngIf="sessoes.length > 0">
+      <h3>Votar na Sessão: {{ selectedSessao?.pautaTitulo }}</h3>
+      <button class="sim" (click)="votar('Sim')">Sim</button>
+      <button class="nao" (click)="votar('Não')">Não</button>
+    </div>
+    <p class="error" *ngIf="cpfError">{{ cpfError }}</p>
+    <p *ngIf="sessoes.length === 0 && !cpfError">Nenhuma sessão aberta para votação.</p>
+  </div>
+</div>

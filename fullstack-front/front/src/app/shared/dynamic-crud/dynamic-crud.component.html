@@ -1,0 +1,107 @@
+<div class="dynamic-crud-container">
+  <h2>{{ config?.title }}</h2>
+
+  <div *ngIf="notification" class="notification">{{ notification }}</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <button *ngIf="!showForm" (click)="toggleForm()" class="toggle-form-btn">Adicionar Novo</button>
+
+  <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="onSubmit()" class="crud-form">
+    <div *ngFor="let field of config?.fields" class="form-field">
+      <label for="{{ field.name }}">{{ field.label }}</label>
+
+      <input
+        *ngIf="field.type === 'input' && field.dataType !== 'number'"
+        [formControlName]="field.name"
+        [id]="field.name"
+        [type]="field.dataType"
+        [placeholder]="field.label"
+        [mask]="field.mask || ''"
+        [disabled]="field.disabled"
+      />
+
+      <input
+        *ngIf="field.type === 'input' && field.dataType === 'number'"
+        [formControlName]="field.name"
+        [id]="field.name"
+        type="number"
+        [placeholder]="field.label"
+        [disabled]="field.disabled"
+      />
+
+      <textarea
+        *ngIf="field.type === 'textarea'"
+        [formControlName]="field.name"
+        [id]="field.name"
+        [placeholder]="field.label"
+        [disabled]="field.disabled"
+      ></textarea>
+
+      <select
+        *ngIf="field.type === 'dropdown'"
+        [formControlName]="field.name"
+        [id]="field.name"
+        [disabled]="field.disabled"
+      >
+        <option *ngFor="let option of field.options" [value]="option">{{ option }}</option>
+      </select>
+
+      <input
+        *ngIf="field.type === 'date'"
+        [formControlName]="field.name"
+        [id]="field.name"
+        type="date"
+        [disabled]="field.disabled"
+      />
+
+      <div class="error" *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+        <span *ngIf="form.get(field.name)?.errors?.['required']">{{ field.label }} é obrigatório</span>
+        <span *ngIf="form.get(field.name)?.errors?.['pattern']">Formato inválido</span>
+        <span *ngIf="form.get(field.name)?.errors?.['invalidCpf']">CPF inválido</span>
+        <span *ngIf="form.get(field.name)?.errors?.['min']">{{ field.label }} deve ser maior que {{ field.minValue }}</span>
+        <span *ngIf="form.get(field.name)?.errors?.['maxLength']">
+          {{ field.label }} deve ter no máximo {{ field.maxLength }} caracteres
+        </span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="form.invalid" class="btn-primary">Salvar</button>
+      <button type="button" (click)="resetForm()" class="btn-danger">Cancelar</button>
+    </div>
+  </form>
+
+  <div *ngIf="hasFilterableFields" class="filters">
+    <div *ngFor="let field of config?.fields" class="filter-field">
+      <input
+        *ngIf="field.filterable"
+        [placeholder]="'Filtrar por ' + field.label"
+        (input)="updateFilter(field.name, $event)"
+      />
+    </div>
+  </div>
+
+  <table *ngIf="config && filteredData.length && !isLoading" class="crud-table">
+    <thead>
+    <tr>
+      <th *ngFor="let field of config.fields" [hidden]="!field.showInTable">{{ field.label }}</th>
+      <th *ngIf="config.actions.view || config.actions.edit || config.actions.delete">Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let item of filteredData">
+      <td *ngFor="let field of config.fields" [hidden]="!field.showInTable">
+        {{ getFieldValue(item, field.name) }}
+      </td>
+      <td *ngIf="config.actions.view || config.actions.edit || config.actions.delete">
+        <button *ngIf="config.actions.view" (click)="viewItem(item)" class="btn-primary">Visualizar</button>
+        <button *ngIf="config.actions.edit && hasId(item)" (click)="editItem(item)" class="btn-primary">Editar</button>
+        <button *ngIf="config.actions.delete && hasId(item)" (click)="deleteItem(item.id)" class="btn-danger">Excluir</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!filteredData.length && !isLoading" class="no-data">Nenhum dado encontrado</div>
+</div>

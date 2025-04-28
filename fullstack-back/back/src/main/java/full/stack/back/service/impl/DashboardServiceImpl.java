@@ -62,7 +62,7 @@ public class DashboardServiceImpl implements DashboardService {
                     DashboardResumoDTO.PautaResumoDTO dto = new DashboardResumoDTO.PautaResumoDTO();
                     dto.setId(pauta.getId());
                     dto.setTitulo(pauta.getTitulo());
-                    dto.setTotalVotos(votoRepository.countByPautaId(pauta.getId()));
+                    dto.setTotalVotos(votoRepository.countBySessaoVotacao_Id(pauta.getId()));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -151,7 +151,7 @@ public class DashboardServiceImpl implements DashboardService {
                     dto.setSessaoId(sessao.getId());
                     dto.setPautaId(sessao.getPauta().getId());
                     dto.setPautaTitulo(sessao.getPauta().getTitulo());
-                    long totalVotos = votoRepository.countByPautaId(sessao.getPauta().getId());
+                    long totalVotos = votoRepository.countBySessaoVotacao_Id(sessao.getPauta().getId());
                     dto.setTotalVotos(totalVotos);
                     dto.setPercentualParticipacao((double) totalVotos / TOTAL_ASSOCIADOS * 100);
                     return dto;

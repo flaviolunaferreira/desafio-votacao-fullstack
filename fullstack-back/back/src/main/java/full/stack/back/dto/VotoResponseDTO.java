@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VotoResponseDTO {
     private Long id;
-    private Long pautaId;
-    private String associadoCpf; // Alterado de Long associadoId
+    private Long sessaoId;
+    private String associadoCpf;
     private Boolean voto; // true = Sim, false = Não
 
 }

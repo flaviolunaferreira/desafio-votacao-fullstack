@@ -6,21 +6,24 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface VotoRepository extends JpaRepository<Voto, Long> {
-    boolean existsByPautaIdAndAssociadoCpf(Long pautaId, String associadoCpf);
 
-    List<Voto> findByPautaId(Long pautaId);
-    long countByPautaId(Long pautaId);
+    @Query("SELECT COUNT(v) > 0 FROM Voto v WHERE v.sessaoVotacao = :sessaoVotacao AND v.associadoCpf = :cpf")
+    boolean existsBySessaoVotacaoAndAssociadoCpf(Long sessaoVotacao, String cpf);
+
+    List<Voto> findBySessaoVotacao_Id(Long sessaoVotacao);
+    long countBySessaoVotacao_Id(Long sessaoVotacao);
 
     @Query("SELECT COUNT(v) FROM Voto v WHERE v.voto = true")
     long countVotosSim();
 
-    @Query("SELECT COUNT(v) FROM Voto v WHERE v.pauta.id = :pautaId AND v.voto = true")
-    Long countVotosSim(Long pautaId);
+    @Query("SELECT COUNT(v) FROM Voto v WHERE v.sessaoVotacao.id = :sessaoVotacao AND v.voto = true")
+    Long countVotosSim(Long sessaoVotacao);
 
-    @Query("SELECT COUNT(v) FROM Voto v WHERE v.pauta.id = :pautaId AND v.voto = false")
-    Long countVotosNao(Long pautaId);
+    @Query("SELECT COUNT(v) FROM Voto v WHERE v.sessaoVotacao.id = :sessaoVotacaoId AND v.voto = false")
+    Long countVotosNao(Long sessaoVotacaoId);
 
     @Query(value = "SELECT " +
             "CASE :granularidade " +
@@ -35,4 +38,6 @@ public interface VotoRepository extends JpaRepository<Voto, Long> {
             "GROUP BY periodo " +
             "ORDER BY periodo", nativeQuery = true)
     List<Object[]> countVotosByPeriodo(LocalDateTime inicio, LocalDateTime fim, String granularidade);
+
+    Voto findByassociadoCpf(String cpf);
 }

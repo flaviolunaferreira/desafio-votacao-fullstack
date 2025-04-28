@@ -4,6 +4,7 @@ import full.stack.back.dto.ResultadoResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 import full.stack.back.service.VotoService;
+import full.stack.back.util.CpfValidation; // Importar a classe de validação
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -18,12 +19,35 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.web.servlet.function.ServerResponse.ok;
+
 @RestController
 @RequestMapping("/api/v1/votos")
 @RequiredArgsConstructor
 public class VotoController {
 
     private final VotoService votoService;
+
+    @PostMapping("/validar-cpf")
+    @Operation(summary = "Valida um CPF", description = "Verifica se o CPF fornecido é válido")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resultado da validação do CPF",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "400", description = "CPF inválido ou mal formatado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"CPF inválido ou mal formatado\"}"))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor\"}")))
+    })
+    public ResponseEntity<Boolean> validarCpf(@RequestBody String cpf) {
+        if (cpf == null || cpf.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(false);
+        }
+        boolean isValid = CpfValidation.isValid(cpf);
+        return ResponseEntity.ok().body(true); //ResponseEntity.ok(isValid);
+    }
 
     @PostMapping
     @Operation(summary = "Registra um voto", description = "Registra o voto de um associado em uma pauta")
@@ -64,8 +88,8 @@ public class VotoController {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor\"}")))
     })
-    public ResponseEntity<VotoResponseDTO> buscarVoto(@PathVariable Long id) {
-        VotoResponseDTO responseDTO = votoService.buscarVoto(id);
+    public ResponseEntity<VotoResponseDTO> buscarVoto(@PathVariable String cpf) {
+        VotoResponseDTO responseDTO = votoService.buscarVoto(cpf);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -82,12 +106,12 @@ public class VotoController {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor\"}")))
     })
-    public ResponseEntity<List<VotoResponseDTO>> listarVotos(@RequestParam(required = false) Long pautaId) {
-        List<VotoResponseDTO> responseDTOs = votoService.listarVotos(pautaId);
+    public ResponseEntity<List<VotoResponseDTO>> listarVotos(@RequestParam(required = false) Long sessaoId) {
+        List<VotoResponseDTO> responseDTOs = votoService.listarVotos(sessaoId);
         return ResponseEntity.ok(responseDTOs);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{cpf}")
     @Operation(summary = "Atualiza um voto", description = "Atualiza os dados de um voto existente, se a sessão ainda estiver aberta")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Voto atualizado com sucesso",
@@ -151,5 +175,11 @@ public class VotoController {
     public ResponseEntity<ResultadoResponseDTO> obterResultado(@PathVariable Long pautaId) {
         ResultadoResponseDTO resultado = votoService.obterResultado(pautaId);
         return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/resultado/{cpf}/{sessaoId}")
+    public ResponseEntity<Boolean> verificaVotoAndSessao(@PathVariable String cpf, @PathVariable Long sessaoId) {
+        Boolean voto = votoService.verificaVotoAndSessao(cpf, sessaoId);
+        return ResponseEntity.ok(voto);
     }
 }

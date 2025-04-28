@@ -1,0 +1,26 @@
+<div class="identificar-eleitor container-dark">
+  <h2>Identificação do Eleitor</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="identificar-form">
+    <div class="form-field">
+      <label for="cpf">CPF</label>
+      <input
+        formControlName="cpf"
+        id="cpf"
+        type="text"
+        mask="000.000.000-00"
+        placeholder="Digite seu CPF"
+      />
+      <div class="error" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
+        <span *ngIf="form.get('cpf')?.errors?.['required']">CPF é obrigatório</span>
+        <span *ngIf="form.get('cpf')?.errors?.['pattern']">Formato de CPF inválido</span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" [disabled]="form.invalid || isLoading" class="btn-primary">
+        Continuar
+      </button>
+    </div>
+  </form>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Validando...</div>
+</div>

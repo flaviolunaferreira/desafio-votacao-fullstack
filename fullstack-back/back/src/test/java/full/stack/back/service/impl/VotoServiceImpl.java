@@ -65,13 +65,13 @@ class VotoServiceImplTest {
 
         voto = new Voto();
         voto.setId(1L);
-        voto.setPauta(pauta);
+        voto.setSessaoVotacao(sessao);
         voto.setAssociadoCpf("11144477735");
         voto.setVoto(true);
         voto.setDataVoto(now);
 
         requestDTO = new VotoRequestDTO();
-        requestDTO.setPautaId(1L);
+        requestDTO.setSessaoId(1L);
         requestDTO.setCpf("11144477735");
         requestDTO.setVoto(true);
     }
@@ -80,19 +80,19 @@ class VotoServiceImplTest {
     void votar_pautaValidaSessaoAbertaCpfValidoNaoVotado_retornaVoto() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
         when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
-        when(votoRepository.existsByPautaIdAndAssociadoCpf(1L, "11144477735")).thenReturn(false);
+        when(votoRepository.existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735")).thenReturn(false);
         when(votoRepository.save(any(Voto.class))).thenReturn(voto);
 
         VotoResponseDTO response = votoService.votar(requestDTO);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
-        assertEquals(1L, response.getPautaId());
+        assertEquals(1L, response.getSessaoId());
         assertEquals("11144477735", response.getAssociadoCpf());
         assertTrue(response.getVoto());
         verify(pautaRepository).findById(1L);
         verify(sessaoVotacaoRepository).findByPautaId(1L);
-        verify(votoRepository).existsByPautaIdAndAssociadoCpf(1L, "11144477735");
+        verify(votoRepository).existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735");
         verify(votoRepository).save(any(Voto.class));
     }
 
@@ -152,7 +152,7 @@ class VotoServiceImplTest {
     void votar_usuarioJaVotou_lancaBusinessException() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
         when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
-        when(votoRepository.existsByPautaIdAndAssociadoCpf(1L, "11144477735")).thenReturn(true);
+        when(votoRepository.existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735")).thenReturn(true);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.votar(requestDTO));
@@ -160,7 +160,7 @@ class VotoServiceImplTest {
         assertEquals("Associado com CPF 11144477735 já votou na pauta: 1", exception.getMessage());
         verify(pautaRepository).findById(1L);
         verify(sessaoVotacaoRepository).findByPautaId(1L);
-        verify(votoRepository).existsByPautaIdAndAssociadoCpf(1L, "11144477735");
+        verify(votoRepository).existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735");
         verifyNoMoreInteractions(votoRepository);
     }
 
@@ -168,11 +168,11 @@ class VotoServiceImplTest {
     void buscarVoto_votoExistente_retornaVoto() {
         when(votoRepository.findById(1L)).thenReturn(Optional.of(voto));
 
-        VotoResponseDTO response = votoService.buscarVoto(1L);
+        VotoResponseDTO response = votoService.buscarVoto("1");
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
-        assertEquals(1L, response.getPautaId());
+        assertEquals(1L, response.getSessaoId());
         assertEquals("11144477735", response.getAssociadoCpf());
         assertTrue(response.getVoto());
         verify(votoRepository).findById(1L);
@@ -184,7 +184,7 @@ class VotoServiceImplTest {
         when(votoRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-                () -> votoService.buscarVoto(1L));
+                () -> votoService.buscarVoto("1"));
 
         assertEquals("Voto não encontrado: 1", exception.getMessage());
         verify(votoRepository).findById(1L);
@@ -194,17 +194,17 @@ class VotoServiceImplTest {
     @Test
     void listarVotos_comPautaId_retornaVotosDaPauta() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(votoRepository.findByPautaId(1L)).thenReturn(Collections.singletonList(voto));
+        when(votoRepository.findBySessaoVotacao_Id(1L)).thenReturn(Collections.singletonList(voto));
 
         List<VotoResponseDTO> response = votoService.listarVotos(1L);
 
         assertEquals(1, response.size());
         assertEquals(1L, response.get(0).getId());
-        assertEquals(1L, response.get(0).getPautaId());
+        assertEquals(1L, response.get(0).getSessaoId());
         assertEquals("11144477735", response.get(0).getAssociadoCpf());
         assertTrue(response.get(0).getVoto());
         verify(pautaRepository).findById(1L);
-        verify(votoRepository).findByPautaId(1L);
+        verify(votoRepository).findBySessaoVotacao_Id(1L);
         verifyNoInteractions(sessaoVotacaoRepository);
     }
 
@@ -216,7 +216,7 @@ class VotoServiceImplTest {
 
         assertEquals(1, response.size());
         assertEquals(1L, response.get(0).getId());
-        assertEquals(1L, response.get(0).getPautaId());
+        assertEquals(1L, response.get(0).getSessaoId());
         assertEquals("11144477735", response.get(0).getAssociadoCpf());
         assertTrue(response.get(0).getVoto());
         verify(votoRepository).findAll();
@@ -248,7 +248,7 @@ class VotoServiceImplTest {
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
-        assertEquals(1L, response.getPautaId());
+        assertEquals(1L, response.getSessaoId());
         assertEquals("98765432100", response.getAssociadoCpf());
         assertFalse(response.getVoto());
         verify(votoRepository).findById(1L);

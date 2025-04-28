@@ -1,0 +1,13 @@
+<!-- src/app/pages/votos/voto-list/voto-list.component.html -->
+<app-dynamic-crud
+  [config]="config"
+  [initialData]="votos"
+  [isLoading]="isLoading"
+  [error]="error"
+  (onCreate)="createVoto($event)"
+  (onUpdate)="updateVoto($event)"
+  (onRemove)="deleteVoto($event)"
+  (onLoadData)="loadVotos()"
+  (onView)="viewVoto($event)"
+>
+</app-dynamic-crud>

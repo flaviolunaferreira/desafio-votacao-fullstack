@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class VotoRequestDTO {
 
-    @NotNull(message = "O ID da pauta é obrigatório")
-    private Long pautaId;
+    @NotNull(message = "O ID da sessão é obrigatório")
+    private Long sessaoId;
 
     @NotBlank(message = "O CPF do associado é obrigatório")
     private String cpf;

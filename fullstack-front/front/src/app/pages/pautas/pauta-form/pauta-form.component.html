@@ -1,0 +1,10 @@
+<div class="pauta-form container-dark">
+  <app-dynamic-crud
+    [config]="config"
+    [initialData]="[pauta]"
+    [isLoading]="isLoading"
+    [error]="error"
+    (onCreate)="savePauta($event)"
+    (onUpdate)="savePauta($event.data)"
+  ></app-dynamic-crud>
+</div>

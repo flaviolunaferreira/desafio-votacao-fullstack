@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface VotoService {
     VotoResponseDTO votar(VotoRequestDTO votoDTO);
-    VotoResponseDTO buscarVoto(Long id);
-    List<VotoResponseDTO> listarVotos(Long pautaId);
+    VotoResponseDTO buscarVoto(String cpf);
+    List<VotoResponseDTO> listarVotos(Long sessaoId);
     VotoResponseDTO atualizarVoto(Long id, VotoRequestDTO votoDTO);
     void deletarVoto(Long id);
     ResultadoResponseDTO obterResultado(Long pautaId);
+
+    Boolean verificaVotoAndSessao(String cpf, Long sessaoId);
 }

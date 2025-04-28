@@ -1,0 +1,60 @@
+.voto-form {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
+}
+
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
+}
+
+.voto-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--input-bg);
+}
+
+.voto-table th,
+.voto-table td {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  color: var(--text-light);
+}
+
+.voto-table th {
+  background-color: var(--header-color);
+  font-weight: bold;
+}
+
+.selected {
+  background-color: var(--accent-orange);
+}
+
+.btn-success,
+.btn-danger,
+.btn-primary {
+  margin-right: 5px;
+}

@@ -1,0 +1,13 @@
+<!-- src/app/pages/sessoes/sessao-list/sessao-list.component.html -->
+<app-dynamic-crud
+  [config]="config"
+  [initialData]="sessoes"
+  [isLoading]="isLoading"
+  [error]="error"
+  (onCreate)="createSessao($event)"
+  (onUpdate)="updateSessao($event)"
+  (onRemove)="deleteSessao($event)"
+  (onLoadData)="loadSessoes()"
+  (onView)="viewSessao($event)"
+>
+</app-dynamic-crud>

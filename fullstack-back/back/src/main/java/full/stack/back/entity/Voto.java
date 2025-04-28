@@ -15,8 +15,8 @@ public class Voto {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pauta_id", nullable = false)
-    private Pauta pauta;
+    @JoinColumn(name = "sessao_id", nullable = false)
+    private SessaoVotacao sessaoVotacao;
 
     @NotNull(message = "O CPF do associado é obrigatório")
     private String associadoCpf; // Alterado de Long associadoId

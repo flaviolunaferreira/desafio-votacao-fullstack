@@ -1,6 +1,7 @@
 package full.stack.back.service.impl;
 
 import full.stack.back.dto.ResultadoResponseDTO;
+import full.stack.back.dto.SessaoAbertaResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 import full.stack.back.entity.Pauta;
@@ -19,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,43 +39,37 @@ public class VotoServiceImpl implements VotoService {
             throw new BusinessException("CPF inválido: " + votoDTO.getCpf());
         }
 
-        // Verificar pauta
-        Pauta pauta = pautaRepository.findById(votoDTO.getPautaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + votoDTO.getPautaId()));
-
-        // Verificar sessão de votação
-        SessaoVotacao sessao = sessaoVotacaoRepository.findByPautaId(votoDTO.getPautaId());
-        if (sessao == null) {
-            throw new BusinessException("Nenhuma sessão de votação aberta para a pauta: " + votoDTO.getPautaId());
-        }
+        Optional<SessaoVotacao> sessao = sessaoVotacaoRepository.findById(votoDTO.getSessaoId());
 
         // Verificar se a sessão está aberta
         LocalDateTime now = LocalDateTime.now();
-        if (sessao.getDataFechamento() != null && now.isAfter(sessao.getDataFechamento())) {
-            throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getPautaId());
+        if (now.isAfter(sessao.get().getDataFechamento())) {
+            throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getSessaoId());
         }
 
         // Verificar se o associado já votou
-        if (votoRepository.existsByPautaIdAndAssociadoCpf(votoDTO.getPautaId(), votoDTO.getCpf())) {
-            throw new BusinessException("Associado com CPF " + votoDTO.getCpf() + " já votou na pauta: " + votoDTO.getPautaId());
+        if (votoRepository.existsBySessaoVotacaoAndAssociadoCpf(votoDTO.getSessaoId(), votoDTO.getCpf())) {
+            throw new BusinessException("Associado com CPF " + votoDTO.getCpf() + " já votou nesta sessão: " + votoDTO.getSessaoId());
         }
 
         // Registrar voto
         Voto voto = new Voto();
-        voto.setPauta(pauta);
+        voto.setSessaoVotacao(sessao.get());
         voto.setAssociadoCpf(votoDTO.getCpf());
         voto.setVoto(votoDTO.getVoto());
         voto.setDataVoto(now);
 
         Voto savedVoto = votoRepository.save(voto);
-        return new VotoResponseDTO(savedVoto.getId(), savedVoto.getPauta().getId(),
+        return new VotoResponseDTO(savedVoto.getId(), savedVoto.getSessaoVotacao().getId(),
                 savedVoto.getAssociadoCpf(), savedVoto.getVoto());
     }
 
     @Override
-    public VotoResponseDTO buscarVoto(Long id) {
-        Voto voto = votoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Voto não encontrado: " + id));
+    public VotoResponseDTO buscarVoto(String cpf) {
+        Voto voto = votoRepository.findByassociadoCpf(cpf);
+        if (voto == null ) {
+            throw new ResourceNotFoundException("Voto não encontrado para o CPF: " + cpf);
+        }
         return toResponseDTO(voto);
     }
 
@@ -83,7 +79,7 @@ public class VotoServiceImpl implements VotoService {
         if (pautaId != null) {
             pautaRepository.findById(pautaId)
                     .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + pautaId));
-            votos = votoRepository.findByPautaId(pautaId);
+            votos = votoRepository.findBySessaoVotacao_Id(pautaId);
         } else {
             votos = votoRepository.findAll();
         }
@@ -104,29 +100,29 @@ public class VotoServiceImpl implements VotoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Voto não encontrado: " + id));
 
         // Verificar pauta
-        Pauta pauta = pautaRepository.findById(votoDTO.getPautaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + votoDTO.getPautaId()));
+        Pauta pauta = pautaRepository.findById(votoDTO.getSessaoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + votoDTO.getSessaoId()));
 
         // Verificar sessão de votação
-        SessaoVotacao sessao = sessaoVotacaoRepository.findByPautaId(votoDTO.getPautaId());
+        SessaoVotacao sessao = sessaoVotacaoRepository.findByPautaId(votoDTO.getSessaoId());
         if (sessao == null) {
-            throw new BusinessException("Nenhuma sessão de votação aberta para a pauta: " + votoDTO.getPautaId());
+            throw new BusinessException("Nenhuma sessão de votação aberta para a pauta: " + votoDTO.getSessaoId());
         }
 
         // Verificar se a sessão está aberta
         LocalDateTime now = LocalDateTime.now();
         if (sessao.getDataFechamento() != null && now.isAfter(sessao.getDataFechamento())) {
-            throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getPautaId());
+            throw new BusinessException("Sessão de votação encerrada para a pauta: " + votoDTO.getSessaoId());
         }
 
         // Atualizar voto
-        voto.setPauta(pauta);
+        voto.setSessaoVotacao(voto.getSessaoVotacao());
         voto.setAssociadoCpf(votoDTO.getCpf());
         voto.setVoto(votoDTO.getVoto());
         voto.setDataVoto(now);
 
         Voto updatedVoto = votoRepository.save(voto);
-        return new VotoResponseDTO(updatedVoto.getId(), updatedVoto.getPauta().getId(),
+        return new VotoResponseDTO(updatedVoto.getId(), updatedVoto.getSessaoVotacao().getId(),
                 updatedVoto.getAssociadoCpf(), updatedVoto.getVoto());
     }
 
@@ -135,7 +131,7 @@ public class VotoServiceImpl implements VotoService {
         Voto voto = votoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Voto não encontrado: " + id));
 
-        SessaoVotacao sessao = sessaoVotacaoRepository.findByPautaId(voto.getPauta().getId());
+        SessaoVotacao sessao = sessaoVotacaoRepository.findByPautaId(voto.getSessaoVotacao().getId());
         if (sessao != null && LocalDateTime.now().isAfter(sessao.getDataFechamento())) {
             throw new BusinessException("Não é possível deletar voto após o encerramento da sessão");
         }
@@ -156,10 +152,33 @@ public class VotoServiceImpl implements VotoService {
         return resultado;
     }
 
+    @Override
+    public Boolean verificaVotoAndSessao(String cpf, Long sessaoId) {
+        return votoRepository.existsBySessaoVotacaoAndAssociadoCpf(sessaoId, cpf);
+
+    }
+
+    public List<SessaoAbertaResponseDTO> listarSessoesAbertasSemVoto(String cpf) {
+        // Busca sessões abertas (dataFim nula ou no futuro)
+        List<SessaoVotacao> sessoesAbertas = sessaoVotacaoRepository.findSessoesAbertas(LocalDateTime.now());
+
+        // Filtra sessões onde o usuário não votou
+        return sessoesAbertas.stream()
+                .filter(sessao -> !votoRepository.existsBySessaoVotacaoAndAssociadoCpf(sessao.getId(), cpf))
+                .map(sessao -> new SessaoAbertaResponseDTO(
+                        sessao.getId(),
+                        sessao.getPauta().getId(),
+                        sessao.getPauta().getTitulo(),
+                        sessao.getDataAbertura(),
+                        sessao.getDataFechamento()
+                ))
+                .collect(Collectors.toList());
+    }
+
     private VotoResponseDTO toResponseDTO(Voto voto) {
         VotoResponseDTO dto = new VotoResponseDTO();
         dto.setId(voto.getId());
-        dto.setPautaId(voto.getPauta().getId());
+        dto.setSessaoId(voto.getSessaoVotacao().getId());
         dto.setAssociadoCpf(voto.getAssociadoCpf());
         dto.setVoto(voto.getVoto());
         return dto;
