@@ -153,11 +153,13 @@ h2 {
 @media (max-width: 768px) {
   .resumo-section {
     grid-template-columns: 1fr;
+    gap: 15px; // Ajuste para melhorar o espaçamento em telas menores
   }
 
   .filter-form {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px; // Adicionado para melhorar o espaçamento entre os elementos
   }
 
   .form-group {
@@ -168,5 +170,22 @@ h2 {
   .dashboard-table td {
     font-size: 12px;
     padding: 8px;
+    word-wrap: break-word; // Adicionado para evitar que textos longos quebrem o layout
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 10px; // Reduzido para melhorar o layout em telas muito pequenas
+  }
+
+  .card p {
+    font-size: 18px; // Reduzido para evitar que o texto fique muito grande
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    font-size: 10px; // Ajustado para telas muito pequenas
+    padding: 6px;
   }
 }

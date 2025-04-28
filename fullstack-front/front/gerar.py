@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Configurações personalizáveis
 DIRETORIO_RAIZ = "C:/Users/Flavio/Desktop/Projeto/desafio-votacao-fullstack/fullstack-front/front/src"  # Substitua pelo caminho real da sua pasta
-ARQUIVO_SAIDA = "todos_os_arquivos.txt"
+ARQUIVO_SAIDA = "todos_os_fronts.txt"
 EXTENSOES_PERMITIDAS = [".html", ".scss", ".ts", ".json"]  # Extensões a serem incluídas
 INCLUIR_CAMINHO_RELATIVO = True  # Define se o caminho relativo será incluído no nome do arquivo
 CODIFICACOES_POSSIVEIS = ["utf-8", "latin-1"]  # Lista de codificações a tentar, em ordem de preferência

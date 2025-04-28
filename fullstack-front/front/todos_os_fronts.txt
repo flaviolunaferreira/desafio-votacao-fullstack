@@ -307,13 +307,11 @@ import { PautaListComponent } from './pages/pautas/pauta-list/pauta-list.compone
 import { PautaFormComponent } from './pages/pautas/pauta-form/pauta-form.component';
 import { SessaoListComponent } from './pages/sessoes/sessao-list/sessao-list.component';
 import { SessaoFormComponent } from './pages/sessoes/sessao-form/sessao-form.component';
-import { VotoListComponent } from './pages/votos/voto-list/voto-list.component';
 import { VotoFormComponent } from './pages/votos/voto-form/voto-form.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { IdentificarEleitorComponent } from './pages/identificar-eleitor/identificar-eleitor.component';
 
 export const routes: Routes = [
-  { path: '', component: IdentificarEleitorComponent },
+  { path: '', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'pautas', component: PautaListComponent },
   { path: 'pautas/novo', component: PautaFormComponent },
@@ -321,11 +319,45 @@ export const routes: Routes = [
   { path: 'sessoes', component: SessaoListComponent },
   { path: 'sessoes/novo', component: SessaoFormComponent },
   { path: 'sessoes/:id', component: SessaoFormComponent },
-  { path: 'votos', component: VotoListComponent },
   { path: 'votos/novo', component: VotoFormComponent },
   { path: 'votos/:id', component: VotoFormComponent },
   { path: '**', component: NotFoundComponent }
 ];
+
+
+
+==================================================
+Arquivo: app\models\Dynamic-table.model.ts
+==================================================
+
+export interface DynamicTableConfig {
+  title: string;
+  fields: FieldConfig[];
+  actions: {
+    create?: boolean;
+    edit?: boolean;
+    delete?: boolean;
+    view?: boolean;
+  };
+  filterable?: boolean;
+}
+
+export interface FieldConfig {
+  name: string;
+  label: string;
+  type: 'input' | 'textarea' | 'dropdown' | 'date' | 'datetime-local' | 'checkbox' | 'radio' | 'switch';
+  dataType: 'string' | 'number' | 'date';
+  required?: boolean;
+  maxLength?: number;
+  minValue?: number;
+  pattern?: RegExp;
+  mask?: string;
+  options?: { value: string; label: string }[];
+  showInTable?: boolean;
+  filterable?: boolean;
+  disabled?: boolean;
+  defaultValue?: any;
+}
 
 
 
@@ -406,6 +438,12 @@ export interface PautaResponseDTO {
 Arquivo: app\models\sessao-votacao.model.ts
 ==================================================
 
+export interface SessaoVotacaoRequestDTO {
+  pautaId: number;
+  dataAbertura?: string;
+  dataFechamento?: string;
+}
+
 export interface SessaoVotacaoResponseDTO {
   id: number;
   pautaId: number;
@@ -413,23 +451,12 @@ export interface SessaoVotacaoResponseDTO {
   dataFechamento: string;
 }
 
-export interface PautaResponseDTO {
-  id: number;
-  titulo: string;
-  descricao: string;
-}
-
-export interface VotoRequestDTO {
-  pautaId: number;
-  cpf: string;
-  voto: 'SIM' | 'NAO';
-}
-
-export interface VotoResponseDTO {
+export interface SessaoAberta {
   id: number;
   pautaId: number;
-  cpf: string;
-  voto: 'SIM' | 'NAO';
+  pautaTitulo: string;
+  dataInicio: string;
+  dataFim: string;
 }
 
 
@@ -479,6 +506,7 @@ Arquivo: app\pages\dashboard\dashboard.component.html
   <div *ngIf="error" class="error-message">{{ error }}</div>
   <div *ngIf="isLoading" class="loading">Carregando...</div>
 
+  <!-- Seção de Resumo -->
   <div class="resumo-section" *ngIf="!isLoading">
     <div class="card">
       <h3>Total de Pautas</h3>
@@ -489,19 +517,60 @@ Arquivo: app\pages\dashboard\dashboard.component.html
       <p>{{ resumo.totalSessoesAbertas }}</p>
     </div>
     <div class="card">
+      <h3>Sessões Encerradas</h3>
+      <p>{{ resumo.totalSessoesEncerradas }}</p>
+    </div>
+    <div class="card">
       <h3>Total de Votos</h3>
       <p>{{ resumo.totalVotos }}</p>
     </div>
     <div class="card">
-      <h3>Votos Hoje</h3>
-      <p>{{ votosHoje }}</p>
+      <h3>% Votos Sim</h3>
+      <p>{{ resumo.percentualVotosSim | number:'1.1-1' }}%</p>
     </div>
     <div class="card">
-      <h3>Sessões Abertas Hoje</h3>
-      <p>{{ sessoesAbertasHoje }}</p>
+      <h3>% Votos Não</h3>
+      <p>{{ resumo.percentualVotosNao | number:'1.1-1' }}%</p>
     </div>
   </div>
 
+  <!-- Filtro de Tendência de Votos -->
+  <div class="section filter-section" *ngIf="!isLoading">
+    <h3>Filtro de Tendência de Votos</h3>
+    <form class="filter-form" (ngSubmit)="filtrarTendencia()">
+      <div class="form-group">
+        <label for="periodo">Período:</label>
+        <select
+          id="periodo"
+          [(ngModel)]="filtroPeriodo"
+          name="periodo"
+          (change)="filtrarTendencia()"
+        >
+          <option value="DIA">Dia</option>
+          <option value="SEMANA">Semana</option>
+          <option value="MES">Mês</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <!-- Gráfico de Tendência de Votos -->
+  <div class="section chart-section" *ngIf="!isLoading && tendenciaVotos.length">
+    <h3>Tendência de Votos</h3>
+    <div class="chart-container">
+      <canvas
+        baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="lineChartType"
+      ></canvas>
+    </div>
+  </div>
+  <div class="no-data" *ngIf="!isLoading && !tendenciaVotos.length">
+    Nenhuma tendência de votos encontrada
+  </div>
+
+  <!-- Tabela de Participação em Sessões -->
   <div class="section" *ngIf="!isLoading && participacaoSessoes.length">
     <h3>Participação em Sessões</h3>
     <table class="dashboard-table">
@@ -520,36 +589,13 @@ Arquivo: app\pages\dashboard\dashboard.component.html
         <td>{{ sessao.pautaId }}</td>
         <td>{{ sessao.pautaTitulo }}</td>
         <td>{{ sessao.totalVotos }}</td>
-        <td>{{ sessao.percentualParticipacao }}%</td>
+        <td>{{ sessao.percentualParticipacao | number:'1.1-1' }}%</td>
       </tr>
       </tbody>
     </table>
   </div>
   <div class="no-data" *ngIf="!isLoading && !participacaoSessoes.length">
     Nenhuma sessão encontrada
-  </div>
-
-  <div class="section" *ngIf="!isLoading && tendenciaVotos.length">
-    <h3>Tendência de Votos</h3>
-    <table class="dashboard-table">
-      <thead>
-      <tr>
-        <th>Período</th>
-        <th>Votos Sim</th>
-        <th>Votos Não</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let tendencia of tendenciaVotos">
-        <td>{{ tendencia.periodo }}</td>
-        <td>{{ tendencia.votosSim }}</td>
-        <td>{{ tendencia.votosNao }}</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="no-data" *ngIf="!isLoading && !tendenciaVotos.length">
-    Nenhuma tendência de votos encontrada
   </div>
 </div>
 
@@ -562,88 +608,145 @@ Arquivo: app\pages\dashboard\dashboard.component.scss
 @use 'sass:color';
 
 $primary-blue: #007acc;
+$background-dark: #1e1e1e;
+$text-light: #ffffff;
+$input-bg: #2d2d2d;
+$border-color: #444;
+$header-color: #333;
+$error-color: #ff4444;
 
 .dashboard-container {
-  background: var(--background-dark);
-  color: var(--text-light);
+  background: $background-dark;
+  color: $text-light;
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 h2 {
   margin-bottom: 20px;
   font-size: 24px;
-  color: var(--text-light);
+  color: $text-light;
 }
 
 .error-message {
-  color: var(--error-color);
-  font-size: 12px;
+  color: $error-color;
+  font-size: 14px;
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .loading {
   text-align: center;
   font-size: 16px;
   margin: 20px 0;
-  color: var(--text-light);
+  color: $text-light;
 }
 
 .resumo-section {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
-  flex-wrap: wrap;
 }
 
 .card {
-  flex: 1;
-  min-width: 200px;
   padding: 15px;
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: $input-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
   text-align: center;
 }
 
 .card h3 {
   margin-bottom: 10px;
-  font-size: 18px;
-  color: var(--text-light);
+  font-size: 16px;
+  color: $text-light;
 }
 
 .card p {
-  font-size: 24px;
-  color: var(--primary-blue);
+  font-size: 22px;
+  color: $primary-blue;
 }
 
 .section {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .section h3 {
   margin-bottom: 15px;
   font-size: 20px;
-  color: var(--text-light);
+  color: $text-light;
+}
+
+.filter-section {
+  background: $input-bg;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.filter-form {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: $text-light;
+}
+
+.form-group select {
+  padding: 8px;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: $text-light;
+  font-size: 14px;
+}
+
+.chart-section {
+  background: $input-bg;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid $border-color;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  max-width: 100%;
 }
 
 .dashboard-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--input-bg);
+  background: $input-bg;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .dashboard-table th,
 .dashboard-table td {
-  padding: 10px;
-  border: 1px solid var(--border-color);
+  padding: 12px;
+  border: 1px solid $border-color;
   text-align: left;
-  color: var(--text-light);
+  color: $text-light;
+  font-size: 14px;
 }
 
 .dashboard-table th {
-  background-color: var(--header-color);
+  background-color: $header-color;
   font-weight: bold;
 }
 
@@ -651,16 +754,46 @@ h2 {
   text-align: center;
   font-size: 16px;
   margin: 20px 0;
-  color: var(--text-light);
+  color: $text-light;
 }
 
 @media (max-width: 768px) {
   .resumo-section {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    gap: 15px; // Ajuste para melhorar o espaçamento em telas menores
   }
 
-  .card {
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px; // Adicionado para melhorar o espaçamento entre os elementos
+  }
+
+  .form-group {
     min-width: 100%;
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    font-size: 12px;
+    padding: 8px;
+    word-wrap: break-word; // Adicionado para evitar que textos longos quebrem o layout
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 10px; // Reduzido para melhorar o layout em telas muito pequenas
+  }
+
+  .card p {
+    font-size: 18px; // Reduzido para evitar que o texto fique muito grande
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    font-size: 10px; // Ajustado para telas muito pequenas
+    padding: 6px;
   }
 }
 
@@ -702,14 +835,17 @@ Arquivo: app\pages\dashboard\dashboard.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgChartsModule } from 'ng2-charts';
 import { DashboardService } from '../../services/dashboard.service';
 import { DashboardResumoDTO, ParticipacaoSessaoDTO, TendenciaVotosDTO } from '../../models/dashboard.model';
 import { ApiError } from '../../models/api-error.model';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, NgChartsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -726,11 +862,47 @@ export class DashboardComponent implements OnInit {
   };
   participacaoSessoes: ParticipacaoSessaoDTO[] = [];
   tendenciaVotos: TendenciaVotosDTO[] = [];
-  votosHoje: number = 0;
-  sessoesAbertasHoje: number = 0;
   isLoading = false;
   error: string | null = null;
   private pendingRequests = 0;
+
+  // Filtro de período
+  filtroPeriodo: string = 'SEMANA'; // Padrão: Semana
+
+  // Configuração do gráfico de tendência
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [
+      {
+        data: [],
+        label: 'Votos Sim',
+        borderColor: '#007acc',
+        backgroundColor: 'rgba(0, 122, 204, 0.2)',
+        fill: true
+      },
+      {
+        data: [],
+        label: 'Votos Não',
+        borderColor: '#ff4444',
+        backgroundColor: 'rgba(255, 68, 68, 0.2)',
+        fill: true
+      }
+    ],
+    labels: []
+  };
+
+  public lineChartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true },
+      title: { display: true, text: 'Tendência de Votos' }
+    },
+    scales: {
+      y: { beginAtZero: true }
+    }
+  };
+
+  public lineChartType: 'line' = 'line';
 
   constructor(private dashboardService: DashboardService) {}
 
@@ -767,221 +939,81 @@ export class DashboardComponent implements OnInit {
       complete: () => { this.trackLoadingComplete(); }
     });
 
+    this.loadTendenciaVotos();
+  }
+
+  loadTendenciaVotos(): void {
+    const { inicio, fim } = this.calcularDatas();
+    const granularidade = this.filtroPeriodo;
+
     this.trackLoadingStart();
-    this.dashboardService.getTendenciaVotos().subscribe({
-      next: (tendencia: TendenciaVotosDTO[]) => { this.tendenciaVotos = tendencia; },
+    this.dashboardService.getTendenciaVotos(inicio, fim, granularidade).subscribe({
+      next: (tendencia: TendenciaVotosDTO[]) => {
+        this.tendenciaVotos = tendencia;
+        this.updateChartData();
+      },
       error: (err: ApiError) => { this.error = err.message || 'Erro ao carregar tendência de votos'; },
       complete: () => { this.trackLoadingComplete(); }
     });
-
-    this.trackLoadingStart();
-    this.dashboardService.getVotosHoje().subscribe({
-      next: (votosHoje: number) => { this.votosHoje = votosHoje; },
-      error: (err: ApiError) => { this.error = err.message || 'Erro ao carregar votos de hoje'; },
-      complete: () => { this.trackLoadingComplete(); }
-    });
-
-    this.trackLoadingStart();
-    this.dashboardService.getSessoesAbertasHoje().subscribe({
-      next: (sessoesAbertasHoje: number) => { this.sessoesAbertasHoje = sessoesAbertasHoje; },
-      error: (err: ApiError) => { this.error = err.message || 'Erro ao carregar sessões abertas de hoje'; },
-      complete: () => { this.trackLoadingComplete(); }
-    });
-  }
-}
-
-
-
-==================================================
-Arquivo: app\pages\identificar-eleitor\identificar-eleitor.component.html
-==================================================
-
-<div class="identificar-eleitor container-dark">
-  <h2>Identificação do Eleitor</h2>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="identificar-form">
-    <div class="form-field">
-      <label for="cpf">CPF</label>
-      <input
-        formControlName="cpf"
-        id="cpf"
-        type="text"
-        mask="000.000.000-00"
-        placeholder="Digite seu CPF"
-      />
-      <div class="error" *ngIf="form.get('cpf')?.invalid && form.get('cpf')?.touched">
-        <span *ngIf="form.get('cpf')?.errors?.['required']">CPF é obrigatório</span>
-        <span *ngIf="form.get('cpf')?.errors?.['pattern']">Formato de CPF inválido</span>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button type="submit" [disabled]="form.invalid || isLoading" class="btn-primary">
-        Continuar
-      </button>
-    </div>
-  </form>
-  <div *ngIf="error" class="error-message">{{ error }}</div>
-  <div *ngIf="isLoading" class="loading">Validando...</div>
-</div>
-
-
-
-==================================================
-Arquivo: app\pages\identificar-eleitor\identificar-eleitor.component.scss
-==================================================
-
-.identificar-eleitor {
-  padding: 40px;
-  max-width: 400px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: var(--text-light);
-}
-
-.identificar-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.form-field label {
-  font-weight: bold;
-  color: var(--text-light);
-}
-
-.form-field input {
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--input-bg);
-  color: var(--text-light);
-}
-
-.form-field input:focus {
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.25rem rgba(0, 122, 204, 0.25);
-}
-
-.form-field .error {
-  color: var(--error-color);
-  font-size: 12px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: center;
-}
-
-.error-message {
-  color: var(--error-color);
-  font-size: 14px;
-  margin-top: 15px;
-}
-
-.loading {
-  text-align: center;
-  font-size: 16px;
-  margin-top: 15px;
-  color: var(--text-light);
-}
-
-
-
-==================================================
-Arquivo: app\pages\identificar-eleitor\identificar-eleitor.component.spec.ts
-==================================================
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { IdentificarEleitorComponent } from './identificar-eleitor.component';
-
-describe('IdentificarEleitorComponent', () => {
-  let component: IdentificarEleitorComponent;
-  let fixture: ComponentFixture<IdentificarEleitorComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [IdentificarEleitorComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(IdentificarEleitorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-
-==================================================
-Arquivo: app\pages\identificar-eleitor\identificar-eleitor.component.ts
-==================================================
-
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { NgxMaskDirective } from 'ngx-mask';
-import { EleitorService } from '../../services/eleitor.service';
-import { ApiError } from '../../models/api-error.model';
-
-@Component({
-  selector: 'app-identificar-eleitor',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgxMaskDirective],
-  templateUrl: './identificar-eleitor.component.html',
-  styleUrls: ['./identificar-eleitor.component.scss']
-})
-export class IdentificarEleitorComponent {
-  form: FormGroup;
-  isLoading = false;
-  error: string | null = null;
-
-  constructor(
-    private fb: FormBuilder,
-    private eleitorService: EleitorService,
-    private router: Router
-  ) {
-    this.form = this.fb.group({
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]]
-    });
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) return;
+  calcularDatas(): { inicio: string; fim: string } {
+    const hoje = new Date();
+    const fim = this.formatarData(hoje);
+    let inicio: string;
 
-    this.isLoading = true;
-    this.error = null;
-    const cpf = this.form.value.cpf.replace(/[^\d]/g, '');
+    switch (this.filtroPeriodo) {
+      case 'DIA':
+        inicio = fim;
+        break;
+      case 'SEMANA':
+        const umaSemanaAtras = new Date(hoje);
+        umaSemanaAtras.setDate(hoje.getDate() - 7);
+        inicio = this.formatarData(umaSemanaAtras);
+        break;
+      case 'MES':
+        const umMesAtras = new Date(hoje);
+        umMesAtras.setDate(hoje.getDate() - 30);
+        inicio = this.formatarData(umMesAtras);
+        break;
+      default:
+        inicio = fim;
+    }
 
-    this.eleitorService.validarCpf(cpf).subscribe({
-      next: (response) => {
-        if (response.status === 'ABLE_TO_VOTE') {
-          this.router.navigate(['/votos/novo'], { queryParams: { cpf } });
-        } else {
-          this.error = 'CPF não habilitado para votação';
+    return { inicio, fim };
+  }
+
+  formatarData(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  updateChartData(): void {
+    this.lineChartData = {
+      datasets: [
+        {
+          data: this.tendenciaVotos.map(t => t.votosSim),
+          label: 'Votos Sim',
+          borderColor: '#007acc',
+          backgroundColor: 'rgba(0, 122, 204, 0.2)',
+          fill: true
+        },
+        {
+          data: this.tendenciaVotos.map(t => t.votosNao),
+          label: 'Votos Não',
+          borderColor: '#ff4444',
+          backgroundColor: 'rgba(255, 68, 68, 0.2)',
+          fill: true
         }
-        this.isLoading = false;
-      },
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao validar CPF';
-        this.isLoading = false;
-      }
-    });
+      ],
+      labels: this.tendenciaVotos.map(t => t.periodo)
+    };
+  }
+
+  filtrarTendencia(): void {
+    this.loadTendenciaVotos();
   }
 }
 
@@ -1463,18 +1495,31 @@ Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.html
 Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.scss
 ==================================================
 
-/* src/app/pages/sessoes/sessao-form/sessao-form.component.scss */
-:host {
-  display: block;
+.sessao-form {
   padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
   background: var(--background-dark);
   color: var(--text-light);
 }
 
-app-dynamic-crud {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
 }
 
 
@@ -1519,7 +1564,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
 import { SessaoVotacaoService } from '../../../services/sessao-votacao.service';
+import { PautaService } from '../../../services/pauta.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { SessaoVotacaoRequestDTO, SessaoVotacaoResponseDTO } from '../../../models/sessao-votacao.model';
+import { PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
 
 @Component({
@@ -1535,7 +1583,14 @@ import { ApiError } from '../../../models/api-error.model';
   styleUrls: ['./sessao-form.component.scss']
 })
 export class SessaoFormComponent implements OnInit {
-  sessao: SessaoVotacaoRequestDTO | SessaoVotacaoResponseDTO = { pautaId: 0 };
+
+
+  sessao: SessaoVotacaoRequestDTO | SessaoVotacaoResponseDTO = {
+    pautaId: 0,
+    dataAbertura: new Date().toISOString().slice(0, 16), // Data atual formatada para datetime-local
+    dataFechamento: undefined
+  };
+  pautas: PautaResponseDTO[] = [];
   isLoading = false;
   error: string | null = null;
   isEditMode = false;
@@ -1545,11 +1600,11 @@ export class SessaoFormComponent implements OnInit {
     fields: [
       {
         name: 'pautaId',
-        label: 'ID da Pauta',
-        type: 'input',
+        label: 'Pauta',
+        type: 'dropdown',
         dataType: 'number',
         required: true,
-        minValue: 1,
+        options: [], // Será preenchido com pautas
         showInTable: false,
         filterable: false,
         disabled: false
@@ -1557,7 +1612,7 @@ export class SessaoFormComponent implements OnInit {
       {
         name: 'dataAbertura',
         label: 'Data e Hora de Abertura',
-        type: 'input',
+        type: 'datetime-local',
         dataType: 'date',
         required: true,
         showInTable: false,
@@ -1567,7 +1622,7 @@ export class SessaoFormComponent implements OnInit {
       {
         name: 'dataFechamento',
         label: 'Data e Hora de Fechamento',
-        type: 'input',
+        type: 'datetime-local',
         dataType: 'date',
         required: false,
         showInTable: false,
@@ -1584,11 +1639,14 @@ export class SessaoFormComponent implements OnInit {
 
   constructor(
     private sessaoService: SessaoVotacaoService,
+    private pautaService: PautaService,
+    private notificationService: NotificationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.loadPautas();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
@@ -1596,11 +1654,33 @@ export class SessaoFormComponent implements OnInit {
     }
   }
 
+  loadPautas(): void {
+    this.isLoading = true;
+    this.pautaService.getAll().subscribe({
+      next: (pautas: PautaResponseDTO[]) => {
+        this.pautas = pautas;
+        const pautaField = this.config.fields.find(f => f.name === 'pautaId');
+        if (pautaField) {
+          pautaField.options = pautas.map(p => p.titulo);
+        }
+        this.isLoading = false;
+      },
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao carregar pautas';
+        this.isLoading = false;
+      }
+    });
+  }
+
   loadSessao(id: number): void {
     this.isLoading = true;
     this.sessaoService.getById(id).subscribe({
       next: (sessao: SessaoVotacaoResponseDTO) => {
-        this.sessao = sessao;
+        this.sessao = {
+          ...sessao,
+          dataAbertura: new Date(sessao.dataAbertura).toISOString().slice(0, 16),
+          dataFechamento: sessao.dataFechamento ? new Date(sessao.dataFechamento).toISOString().slice(0, 16) : undefined
+        };
         this.isLoading = false;
       },
       error: (err: ApiError) => {
@@ -1613,6 +1693,13 @@ export class SessaoFormComponent implements OnInit {
   saveSessao(data: SessaoVotacaoRequestDTO & { dataAbertura?: string, dataFechamento?: string }): void {
     this.isLoading = true;
 
+    // Validar que pautaId é válido
+    if (!data.pautaId || data.pautaId <= 0) {
+      this.error = 'Selecione uma pauta válida';
+      this.isLoading = false;
+      return;
+    }
+
     // Validar que dataFechamento é posterior a dataAbertura, se fornecida
     if (data.dataFechamento && data.dataAbertura) {
       const abertura = new Date(data.dataAbertura);
@@ -1624,12 +1711,20 @@ export class SessaoFormComponent implements OnInit {
       }
     }
 
+    // Preparar dados para envio
+    const sessaoData: SessaoVotacaoRequestDTO = {
+      pautaId: data.pautaId,
+      dataAbertura: data.dataAbertura,
+      dataFechamento: data.dataFechamento || undefined
+    };
+
     const action = this.isEditMode && (this.sessao as SessaoVotacaoResponseDTO).id
-      ? this.sessaoService.update((this.sessao as SessaoVotacaoResponseDTO).id, data)
-      : this.sessaoService.create(data);
+      ? this.sessaoService.update((this.sessao as SessaoVotacaoResponseDTO).id, sessaoData)
+      : this.sessaoService.create(sessaoData);
 
     action.subscribe({
       next: () => {
+        this.notificationService.showSuccess(this.isEditMode ? 'Sessão atualizada com sucesso!' : 'Sessão criada com sucesso!');
         this.isLoading = false;
         this.router.navigate(['/sessoes']);
       },
@@ -1849,46 +1944,64 @@ export class SessaoListComponent implements OnInit {
 Arquivo: app\pages\votos\voto-form\voto-form.component.html
 ==================================================
 
-<div class="voto-form container-dark">
-  <h2>{{ config.title }}</h2>
+<div class="votacao-container container-dark">
+  <!-- Modal CPF -->
+  <div class="modal" *ngIf="showCpfModal">
+    <div class="modal-content">
+      <h2>Informe seu CPF</h2>
+      <input
+        type="text"
+        [(ngModel)]="cpf"
+        placeholder="Digite seu CPF"
+        mask="000.000.000-00"
+        maxlength="14"
+        class="form-control"
+      />
+      <p class="error-text" *ngIf="cpfError">{{ cpfError }}</p>
+      <div class="modal-actions">
+        <button class="btn-primary" (click)="validarCpf()">Validar</button>
+        <button class="btn-danger" (click)="cpf = ''; cpfError = ''">Limpar</button>
+      </div>
+    </div>
+  </div>
 
-  <div *ngIf="error" class="error-message">{{ error }}</div>
-  <div *ngIf="isLoading" class="loading">Carregando...</div>
+  <!-- Tabela de Sessões -->
+  <div class="sessoes-table" *ngIf="!showCpfModal">
+    <table class="voto-table">
+      <thead>
+      <tr>
+        <th>ID Sessão</th>
+        <th>Título da Pauta</th>
+        <th>Data Início</th>
+        <th>Data Fim</th>
+        <th>Tempo Restante</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let sessao of sessoes; let i = index"
+        [ngClass]="{'selected': sessao.id === selectedSessao?.id}"
+        (click)="selecionarSessao(sessao)"
+      >
+        <td>{{ sessao.id }}</td>
+        <td>{{ sessao.pautaTitulo }}</td>
+        <td>{{ sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td [ngStyle]="{'color': getTempoRestanteColor(timers[sessao.id], sessao.dataFim)}">
+          {{ timers[sessao.id] || 'Calculando...' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
 
-  <app-dynamic-crud
-    [config]="config"
-    [initialData]="sessoesAbertas"
-    [isLoading]="isLoading"
-    [error]="error"
-    (onLoadData)="loadSessoesAbertas()"
-  >
-    <ng-template let-item>
-      <td>{{ item.pautaTitulo }}</td>
-      <td>{{ item.dataAbertura | date:'short' }}</td>
-      <td>{{ item.dataFechamento | date:'short' }}</td>
-      <td><app-timer [dataFechamento]="item.dataFechamento"></app-timer></td>
-      <td>
-        <button
-          class="btn-success"
-          [ngClass]="{ 'selected': selectedVoto[item.id] === 'SIM' }"
-          (click)="selectVoto(item.id, 'SIM')"
-        >Sim</button>
-        <button
-          class="btn-danger"
-          [ngClass]="{ 'selected': selectedVoto[item.id] === 'NAO' }"
-          (click)="selectVoto(item.id, 'NAO')"
-        >Não</button>
-        <button
-          class="btn-primary"
-          [disabled]="!selectedVoto[item.id]"
-          (click)="confirmarVoto(item)"
-        >Confirmar Voto</button>
-      </td>
-    </ng-template>
-  </app-dynamic-crud>
-
-  <div *ngIf="!sessoesAbertas.length && !isLoading" class="no-data">
-    Nenhuma sessão de votação aberta disponível
+    <!-- Opções de Votação -->
+    <div class="votacao-opcoes" *ngIf="sessoes.length > 0 && selectedSessao">
+      <h3>Votar na Sessão: {{ selectedSessao.pautaTitulo }}</h3>
+      <button class="btn-success" (click)="votar('SIM')">Sim</button>
+      <button class="btn-danger" (click)="votar('NAO')">Não</button>
+    </div>
+    <p class="error-text" *ngIf="cpfError">{{ cpfError }}</p>
+    <p class="no-data" *ngIf="sessoes.length === 0 && !cpfError">Nenhuma sessão aberta para votação.</p>
   </div>
 </div>
 
@@ -1898,29 +2011,121 @@ Arquivo: app\pages\votos\voto-form\voto-form.component.html
 Arquivo: app\pages\votos\voto-form\voto-form.component.scss
 ==================================================
 
-.voto-form {
-  padding: 20px;
+.votacao-container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  padding: 20px;
+  background: var(--background-dark);
   color: var(--text-light);
 }
 
-.error-message {
-  color: var(--error-color);
-  font-size: 14px;
-  margin-bottom: 15px;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.loading {
+.modal-content {
+  background: var(--input-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
   text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  h2 {
+    color: var(--text-light);
+    margin-bottom: 15px;
+    font-size: 20px;
+  }
+
+  input {
+    width: 100%;
+    margin-bottom: 10px;
+    background: var(--input-bg);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+}
+
+.error-text {
+  color: var(--error-color);
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.sessoes-table {
+  margin-top: 20px;
+
+  .voto-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--input-bg);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+  }
+
+  th {
+    background: var(--header-color);
+    font-weight: bold;
+  }
+
+  tr {
+    cursor: pointer;
+  }
+
+  tr:hover {
+    background: var(--input-bg);
+  }
+
+  tr.selected {
+    background: var(--accent-orange);
+    color: var(--text-light);
+
+    td {
+      color: var(--text-light);
+    }
+  }
+}
+
+.votacao-opcoes {
+  margin-top: 20px;
+  text-align: center;
+
+  h3 {
+    margin-bottom: 15px;
+    color: var(--text-light);
+    font-size: 18px;
+  }
+
+  button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+  }
 }
 
 .no-data {
@@ -1928,16 +2133,6 @@ h2 {
   font-size: 16px;
   margin: 20px 0;
   color: var(--text-light);
-}
-
-.selected {
-  background-color: var(--accent-orange);
-}
-
-.btn-success,
-.btn-danger,
-.btn-primary {
-  margin-right: 5px;
 }
 
 
@@ -1976,354 +2171,160 @@ describe('VotoFormComponent', () => {
 Arquivo: app\pages\votos\voto-form\voto-form.component.ts
 ==================================================
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { FormsModule } from '@angular/forms';
+import { NgxMaskDirective } from 'ngx-mask';
 import { VotoService } from '../../../services/voto.service';
-import { VotoRequestDTO, VotoResponseDTO, SessaoAbertaDTO } from '../../../models/voto.model';
-import { ApiError } from '../../../models/api-error.model';
-import { TimerComponent } from '../../../shared/components/timer/timer.component';
+import { SessaoAberta } from '../../../models/sessao-votacao.model';
+import { interval, Subscription } from 'rxjs';
 import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-voto-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent,
-    TimerComponent
-  ],
+  imports: [CommonModule, FormsModule, NgxMaskDirective],
   templateUrl: './voto-form.component.html',
   styleUrls: ['./voto-form.component.scss']
 })
-export class VotoFormComponent implements OnInit {
-  sessoesAbertas: SessaoAbertaDTO[] = [];
-  selectedVoto: { [key: number]: 'SIM' | 'NAO' | null } = {};
-  isLoading = false;
-  error: string | null = null;
-  cpf: string | null = null;
-
-  config: DynamicTableConfig = {
-    title: 'Sessões de Votação Abertas',
-    fields: [
-      {
-        name: 'pautaTitulo',
-        label: 'Título da Pauta',
-        type: 'input',
-        dataType: 'string',
-        required: false,
-        showInTable: true,
-        filterable: true,
-        disabled: true
-      },
-      {
-        name: 'dataAbertura',
-        label: 'Data de Abertura',
-        type: 'date',
-        dataType: 'date',
-        required: false,
-        showInTable: true,
-        filterable: false,
-        disabled: true
-      },
-      {
-        name: 'dataFechamento',
-        label: 'Data de Fechamento',
-        type: 'date',
-        dataType: 'date',
-        required: false,
-        showInTable: true,
-        filterable: false,
-        disabled: true
-      },
-      {
-        name: 'tempoRestante',
-        label: 'Tempo Restante',
-        type: 'input',
-        dataType: 'string',
-        required: false,
-        showInTable: true,
-        filterable: false,
-        disabled: true
-      }
-    ],
-    actions: {
-      view: false,
-      edit: false,
-      delete: false
-    }
-  };
+export class VotoFormComponent implements OnInit, OnDestroy {
+  cpf: string = '';
+  showCpfModal: boolean = true;
+  cpfError: string = '';
+  sessoes: SessaoAberta[] = [];
+  selectedSessao: SessaoAberta | null = null;
+  timers: { [key: number]: string } = {};
+  private timerSubscription: Subscription | null = null;
 
   constructor(
     private votoService: VotoService,
-    private route: ActivatedRoute,
-    private router: Router,
     private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
-    this.cpf = this.route.snapshot.queryParams['cpf'];
-    if (!this.cpf) {
-      this.error = 'CPF não fornecido';
-      this.router.navigate(['/']);
-      return;
-    }
-    this.loadSessoesAbertas();
+    console.log('VotoFormComponent inicializado');
   }
 
-  loadSessoesAbertas(): void {
-    this.isLoading = true;
-    this.votoService.getSessoesAbertasNaoVotadas(this.cpf!).subscribe({
-      next: (sessoes: SessaoAbertaDTO[]) => {
-        this.sessoesAbertas = sessoes;
-        this.isLoading = false;
+  ngOnDestroy(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+  }
+
+  validarCpf(): void {
+    console.log('Validando CPF:', this.cpf);
+    const cleanCpf = this.cpf.replace(/[^\d]/g, '');
+    if (cleanCpf.length !== 11) {
+      this.cpfError = 'CPF deve conter 11 dígitos';
+      return;
+    }
+
+    this.votoService.validarCpf(cleanCpf).subscribe({
+      next: (isValid) => {
+        console.log('Resposta da validação:', isValid);
+        if (isValid) {
+          this.cpfError = '';
+          this.carregarSessoes(cleanCpf);
+          this.showCpfModal = false;
+        } else {
+          this.cpfError = 'CPF inválido ou não habilitado para votação';
+        }
       },
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao carregar sessões abertas';
-        this.isLoading = false;
+      error: (err) => {
+        console.error('Erro ao validar CPF:', err);
+        this.cpfError = err.error?.message || 'Erro ao validar CPF';
       }
     });
   }
 
-  selectVoto(sessaoId: number, voto: 'SIM' | 'NAO'): void {
-    this.selectedVoto[sessaoId] = voto;
+  carregarSessoes(cpf: string): void {
+    console.log('Carregando sessões para CPF:', cpf);
+    this.votoService.listarSessoesAbertasSemVoto(cpf).subscribe({
+      next: (sessoes: SessaoAberta[]) => {
+        console.log('Sessões carregadas:', sessoes);
+        this.sessoes = sessoes;
+        if (sessoes.length > 0) {
+          this.selectedSessao = sessoes[0];
+        } else {
+          this.cpfError = 'Nenhuma sessão aberta para votação';
+        }
+        this.startTimer();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar sessões:', err);
+        this.cpfError = err.error?.message || 'Erro ao carregar sessões';
+      }
+    });
   }
 
-  confirmarVoto(sessao: SessaoAbertaDTO): void {
-    const voto = this.selectedVoto[sessao.id];
-    if (!voto) {
-      this.notificationService.showError('Selecione Sim ou Não antes de confirmar');
+  selecionarSessao(sessao: SessaoAberta): void {
+    console.log('Sessão selecionada:', sessao);
+    this.selectedSessao = sessao;
+  }
+
+  startTimer(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+    this.timerSubscription = interval(1000).subscribe(() => {
+      const now = new Date();
+      this.sessoes.forEach((sessao) => {
+        const dataFim = new Date(sessao.dataFim);
+        if (isNaN(dataFim.getTime())) {
+          this.timers[sessao.id] = 'Data inválida';
+          return;
+        }
+        const diffMs = dataFim.getTime() - now.getTime();
+        if (diffMs <= 0) {
+          this.timers[sessao.id] = 'Encerrada';
+          this.sessoes = this.sessoes.filter(s => s.id !== sessao.id);
+          if (this.selectedSessao?.id === sessao.id) {
+            this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
+          }
+        } else {
+          const hours = Math.floor(diffMs / (1000 * 60 * 60));
+          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+          this.timers[sessao.id] = `${hours}h ${minutes}m ${seconds}s`;
+        }
+      });
+    });
+  }
+
+  getTempoRestanteColor(tempo: string, dataFim: string): string {
+    if (tempo === 'Encerrada' || tempo === 'Data inválida') return 'var(--error-color)';
+    const diffMs = new Date(dataFim).getTime() - new Date().getTime();
+    if (diffMs <= 60 * 1000) return 'var(--error-color)';
+    if (diffMs <= 30 * 60 * 1000) return '#FF7043';
+    if (diffMs <= 60 * 60 * 1000) return '#FFCA28';
+    return '#66BB6A';
+  }
+
+  votar(voto: 'SIM' | 'NAO'): void {
+    console.log('Registrando voto:', voto);
+    if (!this.selectedSessao) {
+      this.cpfError = 'Nenhuma sessão selecionada';
       return;
     }
-
-    const votoRequest: VotoRequestDTO = {
-      pautaId: sessao.pautaId,
-      cpf: this.cpf!,
-      voto
+    const votoRequest = {
+      pautaId: this.selectedSessao.pautaId,
+      cpf: this.cpf.replace(/[^\d]/g, ''),
+      voto: voto
     };
-
-    this.isLoading = true;
-    this.votoService.create(votoRequest).subscribe({
+    this.votoService.votar(votoRequest).subscribe({
       next: () => {
         this.notificationService.showSuccess('Voto registrado com sucesso!');
-        this.loadSessoesAbertas();
-        delete this.selectedVoto[sessao.id];
-        this.isLoading = false;
+        this.sessoes = this.sessoes.filter(s => s.id !== this.selectedSessao!.id);
+        this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
+        if (this.sessoes.length === 0) {
+          this.cpfError = 'Nenhuma sessão aberta para votação';
+        }
       },
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao registrar voto';
-        this.isLoading = false;
+      error: (err) => {
+        console.error('Erro ao registrar voto:', err);
+        this.cpfError = err.error?.message || 'Erro ao registrar voto';
       }
     });
-  }
-}
-
-
-
-==================================================
-Arquivo: app\pages\votos\voto-list\voto-list.component.html
-==================================================
-
-<!-- src/app/pages/votos/voto-list/voto-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="votos"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createVoto($event)"
-  (onUpdate)="updateVoto($event)"
-  (onRemove)="deleteVoto($event)"
-  (onLoadData)="loadVotos()"
-  (onView)="viewVoto($event)"
->
-</app-dynamic-crud>
-
-
-
-==================================================
-Arquivo: app\pages\votos\voto-list\voto-list.component.scss
-==================================================
-
-/* src/app/pages/votos/voto-list/voto-list.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
-}
-
-app-dynamic-crud {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-
-
-==================================================
-Arquivo: app\pages\votos\voto-list\voto-list.component.spec.ts
-==================================================
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { VotoListComponent } from './voto-list.component';
-
-describe('VotoListComponent', () => {
-  let component: VotoListComponent;
-  let fixture: ComponentFixture<VotoListComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [VotoListComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(VotoListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-
-==================================================
-Arquivo: app\pages\votos\voto-list\voto-list.component.ts
-==================================================
-
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
-import { VotoService } from '../../../services/voto.service';
-import { VotoRequestDTO, VotoResponseDTO } from '../../../models/voto.model';
-import { ApiError } from '../../../models/api-error.model';
-
-@Component({
-  selector: 'app-voto-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
-  templateUrl: './voto-list.component.html',
-  styleUrls: ['./voto-list.component.scss']
-})
-export class VotoListComponent implements OnInit {
-  votos: VotoResponseDTO[] = [];
-  isLoading = false;
-  error: string | null = null;
-
-  config: DynamicTableConfig = {
-    title: 'Lista de Votos',
-    fields: [
-      {
-        name: 'pautaId',
-        label: 'ID da Pauta',
-        type: 'input',
-        dataType: 'number',
-        required: true,
-        minValue: 1,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      },
-      {
-        name: 'cpf',
-        label: 'CPF',
-        type: 'input',
-        dataType: 'string',
-        required: true,
-        mask: '000.000.000-00',
-        pattern: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      },
-      {
-        name: 'voto',
-        label: 'Voto',
-        type: 'dropdown',
-        dataType: 'string',
-        required: true,
-        options: ['SIM', 'NAO'],
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: true,
-      edit: true,
-      delete: true
-    }
-  };
-
-  constructor(private votoService: VotoService, private router: Router) {}
-
-  ngOnInit(): void {
-    this.loadVotos();
-  }
-
-  loadVotos(): void {
-    this.isLoading = true;
-    this.votoService.getAll().subscribe({
-      next: (votos: VotoResponseDTO[]) => {
-        this.votos = votos;
-        this.isLoading = false;
-      },
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao carregar votos';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  createVoto(data: VotoRequestDTO): void {
-    this.isLoading = true;
-    this.votoService.create(data).subscribe({
-      next: () => this.loadVotos(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao registrar voto';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  updateVoto(event: { id: number, data: VotoRequestDTO }): void {
-    this.isLoading = true;
-    this.votoService.update(event.id, event.data).subscribe({
-      next: () => this.loadVotos(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao atualizar voto';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  deleteVoto(id: number): void {
-    this.isLoading = true;
-    this.votoService.delete(id).subscribe({
-      next: () => this.loadVotos(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao deletar voto';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  viewVoto(item: VotoResponseDTO): void {
-    this.router.navigate([`/votos/${item.id}`]);
   }
 }
 
@@ -2334,7 +2335,7 @@ Arquivo: app\services\dashboard.service.ts
 ==================================================
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DashboardResumoDTO, ParticipacaoSessaoDTO, TendenciaVotosDTO } from '../models/dashboard.model';
 
@@ -2351,19 +2352,15 @@ export class DashboardService {
   }
 
   getParticipacaoSessoes(): Observable<ParticipacaoSessaoDTO[]> {
-    return this.http.get<ParticipacaoSessaoDTO[]>(`${this.apiUrl}/participacao-sessoes`);
+    return this.http.get<ParticipacaoSessaoDTO[]>(`${this.apiUrl}/sessoes/participacao`);
   }
 
-  getTendenciaVotos(): Observable<TendenciaVotosDTO[]> {
-    return this.http.get<TendenciaVotosDTO[]>(`${this.apiUrl}/tendencia-votos`);
-  }
-
-  getVotosHoje(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/votos-hoje`);
-  }
-
-  getSessoesAbertasHoje(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/sessoes-abertas-hoje`);
+  getTendenciaVotos(inicio?: string, fim?: string, granularidade?: string): Observable<TendenciaVotosDTO[]> {
+    let params = new HttpParams();
+    if (inicio) params = params.set('inicio', inicio);
+    if (fim) params = params.set('fim', fim);
+    if (granularidade) params = params.set('granularidade', granularidade);
+    return this.http.get<TendenciaVotosDTO[]>(`${this.apiUrl}/votos/tendencia`, { params });
   }
 }
 
@@ -2485,17 +2482,49 @@ Arquivo: app\services\voto.service.ts
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Observable, tap} from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { VotoRequestDTO, VotoResponseDTO, ResultadoResponseDTO, SessaoAbertaDTO } from '../models/voto.model';
+import { SessaoAberta } from '../models/sessao-votacao.model';
+
+interface ValidarCpfResponse {
+  status: 'ABLE_TO_VOTE' | 'UNABLE_TO_VOTE';
+  message?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class VotoService {
   private apiUrl = `${environment.apiUrl}/votos`;
+  private eleitorUrl = `${environment.apiUrl}/votos`; // Alterado para /votos
 
   constructor(private http: HttpClient) {}
+
+  validarCpf(cpf: string): Observable<boolean> {
+    console.log('Enviando requisição para validar CPF:', cpf);
+    return this.http.post<boolean>(`${this.eleitorUrl}/validar-cpf`, cpf, {
+      headers: { 'Content-Type': 'application/json' }
+    }).pipe(
+      tap((response: any) => console.log('Resposta do backend:', response)),
+      map(isValid => {
+        const response: ValidarCpfResponse = {
+          status: isValid ? 'ABLE_TO_VOTE' : 'UNABLE_TO_VOTE',
+          message: isValid ? 'CPF válido' : 'CPF inválido'
+        };
+        return response.status === 'ABLE_TO_VOTE';
+      })
+    );
+  }
+
+  listarSessoesAbertasSemVoto(cpf: string): Observable<SessaoAberta[]> {
+    return this.http.get<SessaoAberta[]>(`${this.apiUrl}/sessoes-abertas-sem-voto/${cpf}`);
+  }
+
+  votar(voto: VotoRequestDTO): Observable<VotoResponseDTO> {
+    return this.http.post<VotoResponseDTO>(this.apiUrl, voto);
+  }
 
   create(voto: VotoRequestDTO): Observable<VotoResponseDTO> {
     return this.http.post<VotoResponseDTO>(this.apiUrl, voto);
@@ -2536,15 +2565,8 @@ Arquivo: app\shared\components\header\header.component.html
 <header class="header">
   <div class="header-content container-dark">
     <div class="logo-title">
-      <img src="assets/logo-dbserver.png" alt="DbServer Logo" class="logo" />
       <h1>Sistema de Votação Online - DbServer</h1>
     </div>
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
-      <a routerLink="/pautas" routerLinkActive="active" class="nav-link">Pautas</a>
-      <a routerLink="/sessoes" routerLinkActive="active" class="nav-link">Sessões</a>
-      <a routerLink="/votos" routerLinkActive="active" class="nav-link">Votos</a>
-    </nav>
   </div>
 </header>
 
@@ -2556,7 +2578,7 @@ Arquivo: app\shared\components\header\header.component.scss
 
 .header {
   background: var(--header-color);
-  padding: 15px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2643,7 +2665,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -2673,7 +2695,7 @@ Arquivo: app\shared\components\sidebar\sidebar.component.html
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" routerLink="/votos" routerLinkActive="active">
+      <a class="nav-link" routerLink="/votos/novo" routerLinkActive="active">
         <i class="bi bi-check-square-fill me-2"></i> Votos
       </a>
     </li>
@@ -3322,7 +3344,7 @@ export class DynamicCrudComponent<T extends Record<string, any>> implements OnIn
 
     const formData = this.form.value as T;
     if (this.isEditMode && this.currentEditId !== null) {
-      this.onUpdate.emit({ id: this.currentEditId, data: formData });
+      this.onUpdate.emit({ id: this.currentEditId, data: formData }); // Emitindo id e dados
       this.notificationService.showSuccess('Item atualizado com sucesso!');
     } else {
       this.onCreate.emit(formData);
@@ -3443,7 +3465,7 @@ export const environment = {
 
 ==================================================
 Resumo:
-Total de arquivos processados: 73
+Total de arquivos processados: 66
 Arquivos com erro: 0
-Arquivos processados com sucesso: 73
+Arquivos processados com sucesso: 66
 ==================================================

@@ -40,4 +40,7 @@ public interface VotoRepository extends JpaRepository<Voto, Long> {
     List<Object[]> countVotosByPeriodo(LocalDateTime inicio, LocalDateTime fim, String granularidade);
 
     Voto findByassociadoCpf(String cpf);
+
+    boolean existsByAssociadoCpfAndSessaoVotacaoId(String cpf, Long sessaoId);
+
 }

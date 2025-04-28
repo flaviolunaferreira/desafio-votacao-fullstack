@@ -26,4 +26,5 @@ public class Voto {
 
     @NotNull(message = "A data do voto é obrigatória")
     private LocalDateTime dataVoto;
+
 }

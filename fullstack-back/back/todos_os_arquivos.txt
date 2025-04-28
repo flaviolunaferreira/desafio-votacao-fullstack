@@ -622,9 +622,11 @@ Arquivo: src\main\java\full\stack\back\controller\VotoController.java
 package full.stack.back.controller;
 
 import full.stack.back.dto.ResultadoResponseDTO;
+import full.stack.back.dto.SessaoAbertaResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 import full.stack.back.service.VotoService;
+import full.stack.back.util.CpfValidation; // Importar a classe de validação
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -645,6 +647,27 @@ import java.util.List;
 public class VotoController {
 
     private final VotoService votoService;
+
+    @PostMapping("/validar-cpf")
+    @Operation(summary = "Valida um CPF", description = "Verifica se o CPF fornecido é válido")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resultado da validação do CPF",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "400", description = "CPF inválido ou mal formatado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"CPF inválido ou mal formatado\"}"))),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "{\"message\": \"Erro interno no servidor\"}")))
+    })
+    public ResponseEntity<Boolean> validarCpf(@RequestBody String cpf) {
+        if (cpf == null || cpf.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(false);
+        }
+        boolean isValid = CpfValidation.isValid(cpf);
+        return ResponseEntity.ok().body(isValid);
+    }
 
     @PostMapping
     @Operation(summary = "Registra um voto", description = "Registra o voto de um associado em uma pauta")
@@ -780,7 +803,15 @@ public class VotoController {
         return ResponseEntity.ok(voto);
     }
 
-
+    @GetMapping("/sessoes-abertas-sem-voto/{cpf}")
+    @Operation(summary = "Lista sessões abertas sem voto", description = "Retorna as sessões abertas em que o eleitor ainda não votou")
+    public ResponseEntity<List<SessaoAbertaResponseDTO>> listarSessoesAbertasSemVoto(@PathVariable String cpf) {
+        if (cpf == null || cpf.trim().isEmpty() || !CpfValidation.isValid(cpf)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<SessaoAbertaResponseDTO> sessoes = votoService.listarSessoesAbertasSemVoto(cpf);
+        return ResponseEntity.ok(sessoes);
+    }
 
 }
 
@@ -1297,6 +1328,7 @@ Arquivo: src\main\java\full\stack\back\repository\VotoRepository.java
 
 package full.stack.back.repository;
 
+import full.stack.back.entity.SessaoVotacao;
 import full.stack.back.entity.Voto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -1337,6 +1369,9 @@ public interface VotoRepository extends JpaRepository<Voto, Long> {
     List<Object[]> countVotosByPeriodo(LocalDateTime inicio, LocalDateTime fim, String granularidade);
 
     Voto findByassociadoCpf(String cpf);
+
+    boolean existsByAssociadoCpfAndSessaoVotacaoId(String cpf, Long sessaoId);
+
 }
 
 
@@ -1411,6 +1446,7 @@ Arquivo: src\main\java\full\stack\back\service\VotoService.java
 package full.stack.back.service;
 
 import full.stack.back.dto.ResultadoResponseDTO;
+import full.stack.back.dto.SessaoAbertaResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 
@@ -1425,6 +1461,8 @@ public interface VotoService {
     ResultadoResponseDTO obterResultado(Long pautaId);
 
     Boolean verificaVotoAndSessao(String cpf, Long sessaoId);
+
+    List<SessaoAbertaResponseDTO> listarSessoesAbertasSemVoto(String cpf);
 }
 
 

@@ -1,6 +1,7 @@
 package full.stack.back.service;
 
 import full.stack.back.dto.ResultadoResponseDTO;
+import full.stack.back.dto.SessaoAbertaResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 
@@ -15,4 +16,6 @@ public interface VotoService {
     ResultadoResponseDTO obterResultado(Long pautaId);
 
     Boolean verificaVotoAndSessao(String cpf, Long sessaoId);
+
+    List<SessaoAbertaResponseDTO> listarSessoesAbertasSemVoto(String cpf);
 }

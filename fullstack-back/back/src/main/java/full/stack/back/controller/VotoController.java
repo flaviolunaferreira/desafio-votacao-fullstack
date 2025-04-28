@@ -1,6 +1,7 @@
 package full.stack.back.controller;
 
 import full.stack.back.dto.ResultadoResponseDTO;
+import full.stack.back.dto.SessaoAbertaResponseDTO;
 import full.stack.back.dto.VotoRequestDTO;
 import full.stack.back.dto.VotoResponseDTO;
 import full.stack.back.service.VotoService;
@@ -46,7 +47,7 @@ public class VotoController {
             return ResponseEntity.badRequest().body(false);
         }
         boolean isValid = CpfValidation.isValid(cpf);
-        return ResponseEntity.ok().body(true); //ResponseEntity.ok(isValid);
+        return ResponseEntity.ok().body(isValid);
     }
 
     @PostMapping
@@ -182,4 +183,15 @@ public class VotoController {
         Boolean voto = votoService.verificaVotoAndSessao(cpf, sessaoId);
         return ResponseEntity.ok(voto);
     }
+
+    @GetMapping("/sessoes-abertas-sem-voto/{cpf}")
+    @Operation(summary = "Lista sessões abertas sem voto", description = "Retorna as sessões abertas em que o eleitor ainda não votou")
+    public ResponseEntity<List<SessaoAbertaResponseDTO>> listarSessoesAbertasSemVoto(@PathVariable String cpf) {
+        if (cpf == null || cpf.trim().isEmpty() || !CpfValidation.isValid(cpf)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<SessaoAbertaResponseDTO> sessoes = votoService.listarSessoesAbertasSemVoto(cpf);
+        return ResponseEntity.ok(sessoes);
+    }
+
 }
