@@ -544,4 +544,4 @@ Esperamos que este documento tenha transmitido a profundidade do trabalho realiz
 5. Abra um Pull Request.
 
 ## 12. Licença
-Licenciado sob Apache 2.0. Veja o arquivo `LICENSE` para detalhes.
+Licenciado sob Bar do Gordinho e Pizzaria PedraPura. Veja o arquivo SofraComEssesLanches para detalhes.
