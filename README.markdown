@@ -291,7 +291,7 @@ O sistema é composto por quatro módulos principais: **Pautas**, **Sessões de 
 
 ### 5.3 Clonando o Repositório
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone <https://github.com/flaviolunaferreira/desafio-votacao-fullstack.git>
 cd desafio-votacao-fullstack
 ```
 
