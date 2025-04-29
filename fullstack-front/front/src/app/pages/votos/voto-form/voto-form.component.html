@@ -51,8 +51,21 @@
 
     <div class="votacao-opcoes" *ngIf="selectedSessao">
       <h3>Votar em: {{ selectedSessao.pautaTitulo }}</h3>
-      <button class="btn-primary" (click)="votar('SIM')">Sim</button>
-      <button class="btn-danger" (click)="votar('NAO')">Não</button>
+      <button class="btn-primary" (click)="iniciarVoto('SIM')">Sim</button>
+      <button class="btn-danger" (click)="iniciarVoto('NAO')">Não</button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal" *ngIf="showConfirmModal">
+    <div class="modal-content">
+      <h3>Confirmar Voto</h3>
+      <p>Você está prestes a votar <strong>{{ confirmVoto }}</strong> na sessão: <strong>{{ selectedSessao?.pautaTitulo || 'Sessão ID ' + selectedSessao?.id }}</strong>.</p>
+      <p>Tem certeza?</p>
+      <div class="button-group">
+        <button class="btn-primary" (click)="confirmarVoto()">Confirmar</button>
+        <button class="btn-danger" (click)="cancelarConfirmacao()">Cancelar</button>
+      </div>
     </div>
   </div>
 

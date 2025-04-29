@@ -20,7 +20,7 @@ public interface SessaoVotacaoRepository extends JpaRepository<SessaoVotacao, Lo
 
     List<SessaoVotacao> findByDataFechamentoAfter(LocalDateTime data);
 
-    @Query("SELECT s FROM SessaoVotacao s WHERE s.dataAbertura IS NULL OR s.dataFechamento > :now")
+    @Query("SELECT s FROM SessaoVotacao s WHERE s.dataFechamento > :now AND s.dataFechamento IS NOT NULL")
     List<SessaoVotacao> findSessoesAbertas(LocalDateTime now);
 
 }

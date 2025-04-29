@@ -20,19 +20,21 @@ import { Router } from '@angular/router';
 })
 export class VotoFormComponent implements OnInit, OnDestroy {
   cpf = '';
-  cpfMask = '000.000.000-00'; // Máscara para CPF
+  cpfMask = '000.000.000-00';
   showCpfModal = true;
   cpfError = '';
   sessoes: SessaoAbertaDTO[] = [];
   selectedSessao: SessaoAbertaDTO | null = null;
   isLoading = false;
   error: string | null = null;
+  showConfirmModal = false; // Controla o modal de confirmação
+  confirmVoto: 'SIM' | 'NAO' | null = null; // Armazena o voto a ser confirmado
   private subscription: Subscription = new Subscription();
 
   constructor(
-    private votoService: VotoService,
-    private eleitorService: EleitorService,
-    private router: Router
+      private votoService: VotoService,
+      private eleitorService: EleitorService,
+      private router: Router
   ) {}
 
   ngOnInit(): void {}
@@ -95,9 +97,58 @@ export class VotoFormComponent implements OnInit, OnDestroy {
     this.selectedSessao = sessao;
   }
 
+  iniciarVoto(voto: 'SIM' | 'NAO'): void {
+    if (!this.selectedSessao) {
+        console.error('Sessão selecionada é nula');
+        this.error = 'Nenhuma sessão selecionada';
+        return;
+    }
+    this.confirmVoto = voto;
+    this.showConfirmModal = true; // Exibe o modal de confirmação
+}
+
+confirmarVoto(): void {
+    if (!this.selectedSessao || !this.confirmVoto) {
+        console.error('Sessão ou voto inválido');
+        this.error = 'Erro ao confirmar voto';
+        this.showConfirmModal = false;
+        return;
+    }
+    this.isLoading = true;
+    const cleanCpf = this.cpf.replace(/\D/g, '');
+    const votoRequest: VotoRequestDTO = {
+        sessaoId: this.selectedSessao.id,
+        cpf: cleanCpf,
+        voto: this.confirmVoto === 'SIM'
+    };
+    console.log('Enviando voto:', JSON.stringify(votoRequest, null, 2));
+    this.votoService.votar(votoRequest).subscribe({
+        next: () => {
+            const sessaoVotada = this.selectedSessao!.pautaTitulo || `Sessão ID ${this.selectedSessao!.id}`;
+            this.sessoes = this.sessoes.filter(s => s.id !== this.selectedSessao!.id);
+            this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
+            this.isLoading = false;
+            this.showConfirmModal = false;
+            alert(`Voto "${this.confirmVoto}" registrado com sucesso na sessão: ${sessaoVotada}!`);
+        },
+        error: (err: ApiError) => {
+            this.error = err.message || 'Erro ao registrar voto';
+            this.isLoading = false;
+            this.showConfirmModal = false;
+            console.error('Erro ao votar:', err);
+        }
+    });
+}
+
+cancelarConfirmacao(): void {
+    this.showConfirmModal = false;
+    this.confirmVoto = null;
+}
+
   votar(voto: 'SIM' | 'NAO'): void {
     if (!this.selectedSessao) {
         console.error('Sessão selecionada é nula');
+        this.error = 'Nenhuma sessão selecionada';
         return;
     }
     this.isLoading = true;
@@ -110,10 +161,11 @@ export class VotoFormComponent implements OnInit, OnDestroy {
     console.log('Enviando voto:', JSON.stringify(votoRequest, null, 2));
     this.votoService.votar(votoRequest).subscribe({
         next: () => {
+            const sessaoVotada = this.selectedSessao!.pautaTitulo || `Sessão ID ${this.selectedSessao!.id}`;
             this.sessoes = this.sessoes.filter(s => s.id !== this.selectedSessao!.id);
             this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
             this.isLoading = false;
-            alert('Voto registrado com sucesso!');
+            alert(`Voto "${voto}" registrado com sucesso na sessão: ${sessaoVotada}!`);
         },
         error: (err: ApiError) => {
             this.error = err.message || 'Erro ao registrar voto';

@@ -13,6 +13,6 @@ public class SessaoAbertaResponseDTO {
     private Long id;
     private Long pautaId;
     private String pautaTitulo;
-    private LocalDateTime dataInicio;
-    private LocalDateTime dataFim;
+    private LocalDateTime dataAbertura;
+    private LocalDateTime dataFechamento;
 }

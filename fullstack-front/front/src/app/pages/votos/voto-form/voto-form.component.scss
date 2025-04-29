@@ -1,5 +1,42 @@
 .container-dark {
-  max-width: 1200px;
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+tr.selected {
+  background-color: #1e0072;
+}
+
+.votacao-opcoes {
+  margin-top: 20px;
+}
+
+.btn-primary, .btn-danger {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
 }
 
 .modal {
@@ -8,79 +45,33 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(24, 24, 24, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .modal-content {
-  background: var(--input-bg);
+  background: rgb(46, 45, 53);
   padding: 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  text-align: center;
-  color: var(--text-light);
-  max-width: 400px;
-  width: 90%;
-}
-
-.modal-content h3 {
-  margin-bottom: 15px;
-}
-
-.modal-content .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-content input {
-  padding: 8px;
+  border-radius: 5px;
+  max-width: 500px;
   width: 100%;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--input-bg);
-  color: var(--text-light);
-}
-
-.modal-content .error {
-  color: var(--error-color);
-  font-size: 12px;
 }
 
 .button-group {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 15px;
-}
-
-table .selected {
-  background: var(--accent-orange);
-}
-
-.votacao-opcoes {
   margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.no-data {
   text-align: center;
-}
-
-.votacao-opcoes button {
-  margin: 0 10px;
-}
-
-@media (max-width: 480px) {
-  .modal-content {
-    padding: 15px;
-  }
-
-  .modal-content h3 {
-    font-size: 18px;
-  }
-
-  .button-group {
-    flex-direction: column;
-    gap: 5px;
-  }
+  padding: 20px;
 }

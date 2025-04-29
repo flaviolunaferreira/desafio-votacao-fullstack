@@ -38,21 +38,21 @@ export class DashboardComponent implements OnInit {
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
-        data: [],
+        data: this.tendenciaVotos.map(t => t.votosSim),
         label: 'Votos Sim',
         borderColor: '#007acc',
-        backgroundColor: 'rgba(0, 122, 204, 0.2)',
-        fill: true
+        backgroundColor: 'rgba(0, 122, 204, 0.5)',
+        fill: 'stack'
       },
       {
-        data: [],
+        data: this.tendenciaVotos.map(t => t.votosNao),
         label: 'Votos Não',
         borderColor: '#ff4444',
-        backgroundColor: 'rgba(255, 68, 68, 0.2)',
-        fill: true
+        backgroundColor: 'rgba(255, 68, 68, 0.5)',
+        fill: 'stack'
       }
     ],
-    labels: []
+    labels: this.tendenciaVotos.map(t => t.periodo)
   };
 
   public lineChartOptions: ChartOptions = {
@@ -60,10 +60,23 @@ export class DashboardComponent implements OnInit {
     maintainAspectRatio: false,
     plugins: {
       legend: { display: true },
-      title: { display: true, text: 'Tendência de Votos' }
+      title: { display: true, text: 'Tendência de Votos' },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.raw} votos`
+        }
+      }
     },
     scales: {
-      y: { beginAtZero: true }
+      y: {
+        beginAtZero: false, // Remover início fixo em zero
+        suggestedMin: Math.min(...this.tendenciaVotos.flatMap(t => [t.votosSim, t.votosNao])) * 0.9,
+        suggestedMax: Math.max(...this.tendenciaVotos.flatMap(t => [t.votosSim, t.votosNao])) * 1.1,
+        title: { display: true, text: 'Número de Votos' }
+      },
+      x: {
+        title: { display: true, text: this.filtroPeriodo === 'SEMANA' ? 'Dia' : 'Semana' }
+      }
     }
   };
 
