@@ -1,13 +1,38 @@
-<!-- src/app/pages/votos/voto-list/voto-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="votos"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createVoto($event)"
-  (onUpdate)="updateVoto($event)"
-  (onRemove)="deleteVoto($event)"
-  (onLoadData)="loadVotos()"
-  (onView)="viewVoto($event)"
->
-</app-dynamic-crud>
+<div class="container-dark">
+  <h2>Lista de Votos</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <div class="filter">
+    <label for="pautaId">Filtrar por Pauta:</label>
+    <select id="pautaId" [(ngModel)]="selectedPautaId" (change)="loadVotos()">
+      <option value="">Todas as pautas</option>
+      <option *ngFor="let pauta of pautas" [value]="pauta.id">{{ pauta.titulo }}</option>
+    </select>
+  </div>
+
+  <table *ngIf="votos.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Pauta</th>
+        <th>CPF</th>
+        <th>Voto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let voto of votos">
+        <td>{{ getPautaTitulo(voto.pautaId) }}</td>
+        <td>{{ voto.cpf }}</td>
+        <td>{{ voto.voto }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="resultado && selectedPautaId" class="resultado">
+    <h3>Resultado da Pauta: {{ getPautaTitulo(+selectedPautaId) }}</h3>
+    <p>Votos Sim: {{ resultado.votosSim }}</p>
+    <p>Votos Não: {{ resultado.votosNao }}</p>
+  </div>
+
+  <div *ngIf="!votos.length && !isLoading" class="no-data">Nenhum voto encontrado</div>
+</div>

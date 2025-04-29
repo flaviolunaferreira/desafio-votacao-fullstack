@@ -10,9 +10,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SessaoVotacaoRepository extends JpaRepository<SessaoVotacao, Long> {
+
     boolean existsByPautaId(Long pautaId);
-    SessaoVotacao findByPautaId(Long pautaId);
+
+    @Query("SELECT s FROM SessaoVotacao s WHERE s.pauta.id = :pautaId AND (s.dataFechamento IS NULL OR s.dataFechamento >= CURRENT_TIMESTAMP)")
+    SessaoVotacao findOpenByPautaId(Long pautaId);
+
     long countByDataFechamentoAfter(LocalDateTime data);
+
     List<SessaoVotacao> findByDataFechamentoAfter(LocalDateTime data);
 
     @Query("SELECT s FROM SessaoVotacao s WHERE s.dataAbertura IS NULL OR s.dataFechamento > :now")

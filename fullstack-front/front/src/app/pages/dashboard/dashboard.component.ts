@@ -128,9 +128,6 @@ export class DashboardComponent implements OnInit {
     let inicio: string;
 
     switch (this.filtroPeriodo) {
-      case 'DIA':
-        inicio = fim;
-        break;
       case 'SEMANA':
         const umaSemanaAtras = new Date(hoje);
         umaSemanaAtras.setDate(hoje.getDate() - 7);

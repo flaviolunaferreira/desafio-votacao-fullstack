@@ -19,16 +19,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
-
+    Logger log = LoggerFactory.getLogger(this.getClass());
     private final PautaRepository pautaRepository;
     private final SessaoVotacaoRepository sessaoVotacaoRepository;
     private final VotoRepository votoRepository;
 
-    private static final long TOTAL_ASSOCIADOS = 100; // Suposição: ajustar conforme necessário
+    private static final long TOTAL_ASSOCIADOS = 50; // Suposição: ajustar conforme necessário
 
     @Override
     public DashboardResumoDTO obterResumo() {
@@ -86,45 +88,68 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<TendenciaVotosDTO> obterTendenciaVotos(String inicio, String fim, String granularidade) {
+        Logger log = LoggerFactory.getLogger(this.getClass());
+        log.info("Obtendo tendência de votos: inicio={}, fim={}, granularidade={}", inicio, fim, granularidade);
+
         // Validar datas
         LocalDate dataInicio, dataFim;
         try {
             dataInicio = LocalDate.parse(inicio, DateTimeFormatter.ISO_LOCAL_DATE);
             dataFim = LocalDate.parse(fim, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (Exception e) {
+            log.error("Formato de data inválido: {}", e.getMessage());
             throw new BusinessException("Formato de data inválido. Use YYYY-MM-DD");
         }
         if (dataInicio.isAfter(dataFim)) {
-            throw new BusinessException("Data de início deve ser anterior à data de fim");
+            log.warn("Data de início posterior à data de fim: {} > {}", inicio, fim);
+            throw new BusinessException("Data de início deve ser anterior ou igual à data de fim");
         }
 
         // Validar granularidade
         granularidade = granularidade.toUpperCase();
         if (!List.of("DIA", "SEMANA", "MES").contains(granularidade)) {
+            log.warn("Granularidade inválida: {}", granularidade);
             throw new BusinessException("Granularidade deve ser DIA, SEMANA ou MES");
         }
 
         // Consultar votos no período
-        List<Object[]> resultados = votoRepository.countVotosByPeriodo(dataInicio.atStartOfDay(), dataFim.plusDays(1).atStartOfDay(), granularidade);
-        List<TendenciaVotosDTO> tendencias = new ArrayList<>();
+        LocalDateTime inicioPeriodo = dataInicio.atStartOfDay();
+        LocalDateTime fimPeriodo = dataFim.atTime(23, 59, 59, 999999999); // Incluir todo o dia de fim
+        List<Object[]> resultados = votoRepository.countVotosByPeriodo(inicioPeriodo, fimPeriodo, granularidade);
+        log.debug("Resultados da query: {} registros", resultados.size());
 
         // Mapear resultados
-        DateTimeFormatter formatter = switch (granularidade) {
-            case "DIA" -> DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            case "SEMANA" -> DateTimeFormatter.ofPattern("yyyy-'W'ww");
-            case "MES" -> DateTimeFormatter.ofPattern("yyyy-MM");
-            default -> DateTimeFormatter.ISO_LOCAL_DATE;
-        };
-
+        List<TendenciaVotosDTO> tendencias = new ArrayList<>();
         for (Object[] resultado : resultados) {
+            log.debug("Processando resultado: periodo={}, votosSim={}, votosNao={}",
+                    resultado[0], resultado[1], resultado[2]);
             TendenciaVotosDTO dto = new TendenciaVotosDTO();
-            LocalDateTime data = ((java.sql.Timestamp) resultado[0]).toLocalDateTime();
-            dto.setPeriodo(data.format(formatter));
-            dto.setVotosSim((Long) resultado[1]);
-            dto.setVotosNao((Long) resultado[2]);
+            String periodo;
+
+            if ("DIA".equals(granularidade)) {
+                LocalDate date;
+                if (resultado[0] instanceof java.sql.Timestamp) {
+                    date = ((java.sql.Timestamp) resultado[0]).toLocalDateTime().toLocalDate();
+                } else if (resultado[0] instanceof java.sql.Date) {
+                    date = ((java.sql.Date) resultado[0]).toLocalDate();
+                } else {
+                    log.error("Tipo inesperado para periodo em DIA: {}", resultado[0].getClass().getName());
+                    throw new BusinessException("Erro ao processar período: tipo de dado inválido");
+                }
+                periodo = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } else if ("SEMANA".equals(granularidade)) {
+                periodo = (String) resultado[0]; // e.g., 2025-17
+            } else {
+                periodo = (String) resultado[0]; // e.g., 2025-04
+            }
+
+            dto.setPeriodo(periodo);
+            dto.setVotosSim(((Number) resultado[1]).longValue());
+            dto.setVotosNao(((Number) resultado[2]).longValue());
             tendencias.add(dto);
         }
 
+        log.info("Tendências retornadas: {} registros", tendencias.size());
         return tendencias;
     }
 

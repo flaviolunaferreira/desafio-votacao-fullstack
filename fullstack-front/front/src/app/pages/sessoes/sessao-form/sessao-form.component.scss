@@ -1,60 +1,75 @@
-.voto-form {
-  padding: 20px;
-  max-width: 1200px;
+.sessao-form {
+  max-width: 500px;
   margin: 0 auto;
-}
+  padding: 20px;
 
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: var(--text-light);
-}
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-.error-message {
-  color: var(--error-color);
-  font-size: 14px;
-  margin-bottom: 15px;
-}
+  .form-group {
+    margin-bottom: 15px;
 
-.loading {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
-}
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
 
-.no-data {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
-}
+    select,
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
 
-.voto-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--input-bg);
-}
+    select.invalid,
+    input.invalid {
+      border-color: red;
+    }
+  }
 
-.voto-table th,
-.voto-table td {
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  text-align: left;
-  color: var(--text-light);
-}
+  .error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+  }
 
-.voto-table th {
-  background-color: var(--header-color);
-  font-weight: bold;
-}
+  .loading {
+    text-align: center;
+    color: #555;
+    margin: 20px 0;
+  }
 
-.selected {
-  background-color: var(--accent-orange);
-}
+  .button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 
-.btn-success,
-.btn-danger,
-.btn-primary {
-  margin-right: 5px;
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button[type="submit"] {
+      background-color: #28a745;
+      color: white;
+    }
+
+    button[type="button"] {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    button[disabled] {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
 }

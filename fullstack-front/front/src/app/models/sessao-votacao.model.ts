@@ -1,7 +1,6 @@
 export interface SessaoVotacaoRequestDTO {
   pautaId: number;
-  dataAbertura?: string;
-  dataFechamento?: string;
+  duracao?: number; // Alinhado com o backend
 }
 
 export interface SessaoVotacaoResponseDTO {
@@ -9,6 +8,7 @@ export interface SessaoVotacaoResponseDTO {
   pautaId: number;
   dataAbertura: string;
   dataFechamento: string;
+  duracao?: number;
 }
 
 export interface SessaoAberta {

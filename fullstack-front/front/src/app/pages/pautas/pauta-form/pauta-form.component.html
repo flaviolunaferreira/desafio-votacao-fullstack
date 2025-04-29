@@ -1,10 +1,39 @@
-<div class="pauta-form container-dark">
-  <app-dynamic-crud
-    [config]="config"
-    [initialData]="[pauta]"
-    [isLoading]="isLoading"
-    [error]="error"
-    (onCreate)="savePauta($event)"
-    (onUpdate)="savePauta($event.data)"
-  ></app-dynamic-crud>
+<div class="container-dark">
+  <h2>{{ isEditMode ? 'Editar Pauta' : 'Nova Pauta' }}</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <form [formGroup]="pautaForm" (ngSubmit)="savePauta()">
+    <div class="form-group">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        formControlName="titulo"
+        type="text"
+        placeholder="Digite o título"
+      />
+      <div class="error" *ngIf="pautaForm.get('titulo')?.invalid && pautaForm.get('titulo')?.touched">
+        <span *ngIf="pautaForm.get('titulo')?.errors?.['required']">Título é obrigatório</span>
+        <span *ngIf="pautaForm.get('titulo')?.errors?.['maxlength']">Máximo 100 caracteres</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descricao">Descrição</label>
+      <textarea
+        id="descricao"
+        formControlName="descricao"
+        placeholder="Digite a descrição"
+      ></textarea>
+      <div class="error" *ngIf="pautaForm.get('descricao')?.invalid && pautaForm.get('descricao')?.touched">
+        <span *ngIf="pautaForm.get('descricao')?.errors?.['required']">Descrição é obrigatória</span>
+        <span *ngIf="pautaForm.get('descricao')?.errors?.['maxlength']">Máximo 500 caracteres</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn-primary" [disabled]="pautaForm.invalid || isLoading">Salvar</button>
+      <button type="button" class="btn-danger" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
 </div>

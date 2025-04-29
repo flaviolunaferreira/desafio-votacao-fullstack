@@ -16,6 +16,14 @@ export class TimerComponent implements OnInit, OnDestroy {
   private subscription!: Subscription;
 
   ngOnInit(): void {
+    if (!this.dataFechamento) {
+      console.error('dataFechamento é nulo ou vazio:', this.dataFechamento);
+      this.tempoRestante = 'Data inválida';
+      this.timerClass = 'expired';
+      return;
+    }
+
+    console.log('dataFechamento recebido:', this.dataFechamento);
     this.updateTimer();
     this.subscription = interval(1000).subscribe(() => this.updateTimer());
   }
@@ -29,17 +37,26 @@ export class TimerComponent implements OnInit, OnDestroy {
   private updateTimer(): void {
     const now = new Date();
     const fechamento = new Date(this.dataFechamento);
+
+    if (isNaN(fechamento.getTime())) {
+      console.error('dataFechamento inválida:', this.dataFechamento);
+      this.tempoRestante = 'Data inválida';
+      this.timerClass = 'expired';
+      return;
+    }
+
     const diffMs = fechamento.getTime() - now.getTime();
 
     if (diffMs <= 0) {
       this.tempoRestante = 'Sessão encerrada';
       this.timerClass = 'expired';
+      this.subscription.unsubscribe(); // Para o intervalo
       return;
     }
 
     const minutes = Math.floor(diffMs / 1000 / 60);
     const seconds = Math.floor((diffMs / 1000) % 60);
-    this.tempoRestante = `${minutes}m ${seconds}s`;
+    this.tempoRestante = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
 
     if (minutes > 10) {
       this.timerClass = 'green';

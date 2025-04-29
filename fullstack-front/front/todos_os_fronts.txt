@@ -37,8 +37,7 @@ import { routes } from './app/app.routes';
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
-    provideNgxMask()
+    provideHttpClient()
   ]
 }).catch(err => console.error(err));
 
@@ -48,74 +47,61 @@ bootstrapApplication(AppComponent, {
 Arquivo: styles.scss
 ==================================================
 
-@use 'sass:color';
-
-// Variáveis do Bootstrap
-$primary: #007acc; // --primary-blue
-$body-bg: #1e1e1e; // --background-dark
-$body-color: #d4d4d4; // --text-light
-$input-bg: #252526; // --input-bg
-$border-color: #3c3c3c; // --border-color
-$header-color: #333333; // --header-color
-$sidebar-color: #272727; // --sidebar-color
-$btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d4d4d4'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707A1 1 0 01.293.293z'/%3e%3c/svg%3e");
-
-// Variáveis do projeto
-$text-light: #d4d4d4;
-$link-color: #3794ff;
-$primary-blue: #007acc;
-$accent-orange: #d19a66;
-$error-color: #f48771;
-$background-dark: #1e1e1e;
 
 :root {
-  --background-color: #242323;
-  --sidebar-color: #272727;
-  --text-color: #dfdfdf;
-  --border-color: #3c3c3c;
-  --scrollbar-color: #3c3c3c;
-  --scrollbar-thumb-color: #1d1d1d;
-  --header-color: #333333;
-  --footer-color: #333333;
-  --link-color: #3794ff;
-  --primary-color: #152d3d;
   --background-dark: #1e1e1e;
   --primary-blue: #007acc;
-  --accent-orange: #d19a66;
   --text-light: #d4d4d4;
   --input-bg: #252526;
+  --border-color: #3c3c3c;
   --error-color: #f48771;
+  --header-color: #333333;
+  --sidebar-color: #272727;
+  --link-color: #3794ff;
+  --accent-orange: #d19a66;
 }
 
-// Estilos globais
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: $body-bg;
-  color: $body-color;
+  background-color: var(--background-dark);
+  color: var(--text-light);
 }
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-// Classes utilitárias
 .container-dark {
-  background: $background-dark;
-  color: $text-light;
+  background: var(--background-dark);
+  color: var(--text-light);
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.error-text {
-  color: $error-color;
-  font-size: 12px;
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
 }
 
 .btn-primary {
-  background-color: $primary-blue;
-  color: $text-light;
+  background-color: var(--primary-blue);
+  color: var(--text-light);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -123,25 +109,12 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: color.adjust($primary-blue, $lightness: -10%);
-}
-
-.btn-success {
-  background-color: #28a745;
-  color: $text-light;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-success:hover {
-  background-color: color.adjust(#28a745, $lightness: -10%);
+  background-color: var(--primary-blue);
 }
 
 .btn-danger {
-  background-color: $error-color;
-  color: $text-light;
+  background-color: var(--error-color);
+  color: var(--text-light);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -149,70 +122,93 @@ body {
 }
 
 .btn-danger:hover {
-  background-color: color.adjust($error-color, $lightness: -10%);
+  background-color: --error-color;
 }
 
-// Estilizar barras de rolagem
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: $border-color;
-}
-::-webkit-scrollbar-thumb {
-  background: #1d1d1d;
-  border-radius: 4px;
-}
-
-// Ajustes para modais
-.modal-content {
-  background: $input-bg;
-  color: $text-light;
-  border: 1px solid $border-color;
-}
-.modal-header, .modal-footer {
-  border-color: $border-color;
-}
-.form-control {
-  background: $input-bg;
-  color: $text-light;
-  border-color: $border-color;
-}
-.form-control:focus {
-  background: $input-bg;
-  color: $text-light;
-  border-color: $primary-blue;
-  box-shadow: 0 0 0 0.25rem rgba(0, 122, 204, 0.25);
-}
-.invalid-feedback {
-  color: $error-color;
-}
-
-.sidebar {
-  background: var(--sidebar-color);
-  width: 250px;
-  min-height: 100vh;
-  padding: 20px;
-  border-right: 1px solid var(--border-color);
-}
-
-.header {
-  background: var(--primary-blue);
-  height: 60px;
+form {
   display: flex;
-  align-items: center;
-  padding: 0 20px;
+  flex-direction: column;
+  gap: 15px;
+  background: var(--input-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: bold;
   color: var(--text-light);
-  font-size: 20px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-light);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+}
+
+.form-group .error {
+  color: var(--error-color);
+  font-size: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--input-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  color: var(--text-light);
+}
+
+th {
+  background: var(--header-color);
   font-weight: bold;
 }
 
-.main {
-  background: var(--background-dark);
-  padding: 20px;
-  flex: 1;
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
 }
 
+@media (max-width: 768px) {
+  .container-dark {
+    padding: 10px;
+  }
+
+  form {
+    padding: 15px;
+  }
+
+  table th, table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
 
 
 
@@ -308,6 +304,7 @@ import { PautaFormComponent } from './pages/pautas/pauta-form/pauta-form.compone
 import { SessaoListComponent } from './pages/sessoes/sessao-list/sessao-list.component';
 import { SessaoFormComponent } from './pages/sessoes/sessao-form/sessao-form.component';
 import { VotoFormComponent } from './pages/votos/voto-form/voto-form.component';
+import { VotoListComponent } from './pages/votos/voto-list/voto-list.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
@@ -319,8 +316,8 @@ export const routes: Routes = [
   { path: 'sessoes', component: SessaoListComponent },
   { path: 'sessoes/novo', component: SessaoFormComponent },
   { path: 'sessoes/:id', component: SessaoFormComponent },
+  { path: 'votos', component: VotoListComponent },
   { path: 'votos/novo', component: VotoFormComponent },
-  { path: 'votos/:id', component: VotoFormComponent },
   { path: '**', component: NotFoundComponent }
 ];
 
@@ -1105,15 +1102,44 @@ export class NotFoundComponent {}
 Arquivo: app\pages\pautas\pauta-form\pauta-form.component.html
 ==================================================
 
-<div class="pauta-form container-dark">
-  <app-dynamic-crud
-    [config]="config"
-    [initialData]="[pauta]"
-    [isLoading]="isLoading"
-    [error]="error"
-    (onCreate)="savePauta($event)"
-    (onUpdate)="savePauta($event.data)"
-  ></app-dynamic-crud>
+<div class="container-dark">
+  <h2>{{ isEditMode ? 'Editar Pauta' : 'Nova Pauta' }}</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <form [formGroup]="pautaForm" (ngSubmit)="savePauta()">
+    <div class="form-group">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        formControlName="titulo"
+        type="text"
+        placeholder="Digite o título"
+      />
+      <div class="error" *ngIf="pautaForm.get('titulo')?.invalid && pautaForm.get('titulo')?.touched">
+        <span *ngIf="pautaForm.get('titulo')?.errors?.['required']">Título é obrigatório</span>
+        <span *ngIf="pautaForm.get('titulo')?.errors?.['maxlength']">Máximo 100 caracteres</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descricao">Descrição</label>
+      <textarea
+        id="descricao"
+        formControlName="descricao"
+        placeholder="Digite a descrição"
+      ></textarea>
+      <div class="error" *ngIf="pautaForm.get('descricao')?.invalid && pautaForm.get('descricao')?.touched">
+        <span *ngIf="pautaForm.get('descricao')?.errors?.['required']">Descrição é obrigatória</span>
+        <span *ngIf="pautaForm.get('descricao')?.errors?.['maxlength']">Máximo 500 caracteres</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn-primary" [disabled]="pautaForm.invalid || isLoading">Salvar</button>
+      <button type="button" class="btn-danger" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
 </div>
 
 
@@ -1122,18 +1148,8 @@ Arquivo: app\pages\pautas\pauta-form\pauta-form.component.html
 Arquivo: app\pages\pautas\pauta-form\pauta-form.component.scss
 ==================================================
 
-/* src/app/pages/pautas/pauta-form/pauta-form.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
-}
-
-app-dynamic-crud {
-  width: 100%;
+.container-dark {
   max-width: 600px;
-  margin: 0 auto;
 }
 
 
@@ -1174,9 +1190,8 @@ Arquivo: app\pages\pautas\pauta-form\pauta-form.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PautaService } from '../../../services/pauta.service';
 import { PautaRequestDTO, PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
@@ -1184,73 +1199,43 @@ import { ApiError } from '../../../models/api-error.model';
 @Component({
   selector: 'app-pauta-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './pauta-form.component.html',
   styleUrls: ['./pauta-form.component.scss']
 })
 export class PautaFormComponent implements OnInit {
-  pauta: PautaRequestDTO | PautaResponseDTO = { titulo: '', descricao: '' };
+  pautaForm!: ReturnType<FormBuilder['group']>;
   isLoading = false;
   error: string | null = null;
   isEditMode = false;
-
-  config: DynamicTableConfig = {
-    title: 'Gerenciar Pauta',
-    fields: [
-      {
-        name: 'titulo',
-        label: 'Título',
-        type: 'input',
-        dataType: 'string',
-        required: true,
-        maxLength: 100,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      },
-      {
-        name: 'descricao',
-        label: 'Descrição',
-        type: 'textarea',
-        dataType: 'string',
-        required: true,
-        maxLength: 500,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: false,
-      edit: false,
-      delete: false
-    }
-  };
+  pautaId: number | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private pautaService: PautaService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEditMode = true;
-      this.loadPauta(+id);
-    }
+  this.pautaForm = this.fb.group({
+    titulo: ['', [Validators.required, Validators.maxLength(100)]],
+    descricao: ['', [Validators.required, Validators.maxLength(500)]]
+  });
+
+  const id = this.route.snapshot.paramMap.get('id');
+  if (id) {
+    this.isEditMode = true;
+    this.pautaId = +id;
+    this.loadPauta(this.pautaId);
+  }
   }
 
   loadPauta(id: number): void {
     this.isLoading = true;
     this.pautaService.getById(id).subscribe({
       next: (pauta: PautaResponseDTO) => {
-        this.pauta = pauta;
+        this.pautaForm.patchValue(pauta);
         this.isLoading = false;
       },
       error: (err: ApiError) => {
@@ -1260,11 +1245,14 @@ export class PautaFormComponent implements OnInit {
     });
   }
 
-  savePauta(data: PautaRequestDTO): void {
+  savePauta(): void {
+    if (this.pautaForm.invalid) return;
     this.isLoading = true;
-    const action = this.isEditMode && (this.pauta as PautaResponseDTO).id
-      ? this.pautaService.update((this.pauta as PautaResponseDTO).id, data)
-      : this.pautaService.create(data);
+    const pautaData: PautaRequestDTO = this.pautaForm.value as PautaRequestDTO;
+
+    const action = this.isEditMode && this.pautaId
+      ? this.pautaService.update(this.pautaId, pautaData)
+      : this.pautaService.create(pautaData);
 
     action.subscribe({
       next: () => {
@@ -1277,6 +1265,10 @@ export class PautaFormComponent implements OnInit {
       }
     });
   }
+
+  cancel(): void {
+    this.router.navigate(['/pautas']);
+  }
 }
 
 
@@ -1285,19 +1277,35 @@ export class PautaFormComponent implements OnInit {
 Arquivo: app\pages\pautas\pauta-list\pauta-list.component.html
 ==================================================
 
-<!-- src/app/pages/pautas/pauta-list/pauta-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="pautas"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createPauta($event)"
-  (onUpdate)="updatePauta($event)"
-  (onRemove)="deletePauta($event)"
-  (onLoadData)="loadPautas()"
-  (onView)="viewPauta($event)"
->
-</app-dynamic-crud>
+<div class="container-dark">
+  <h2>Lista de Pautas</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <button class="btn-primary" routerLink="/pautas/novo">Nova Pauta</button>
+
+  <table *ngIf="pautas.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descrição</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pauta of pautas">
+        <td>{{ pauta.titulo }}</td>
+        <td>{{ pauta.descricao }}</td>
+        <td>
+          <button class="btn-primary" [routerLink]="['/pautas', pauta.id]">Editar</button>
+          <button class="btn-danger" (click)="deletePauta(pauta.id)">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!pautas.length && !isLoading" class="no-data">Nenhuma pauta encontrada</div>
+</div>
 
 
 
@@ -1305,18 +1313,12 @@ Arquivo: app\pages\pautas\pauta-list\pauta-list.component.html
 Arquivo: app\pages\pautas\pauta-list\pauta-list.component.scss
 ==================================================
 
-/* src/app/pages/pautas/pauta-list/pauta-list.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
+.container-dark {
+  max-width: 1200px;
 }
 
-app-dynamic-crud {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+button {
+  margin: 5px;
 }
 
 
@@ -1357,22 +1359,15 @@ Arquivo: app\pages\pautas\pauta-list\pauta-list.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { RouterModule } from '@angular/router';
 import { PautaService } from '../../../services/pauta.service';
-import { PautaRequestDTO, PautaResponseDTO } from '../../../models/pauta.model';
+import { PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
 
 @Component({
   selector: 'app-pauta-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './pauta-list.component.html',
   styleUrls: ['./pauta-list.component.scss']
 })
@@ -1381,40 +1376,7 @@ export class PautaListComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
 
-  config: DynamicTableConfig = {
-    title: 'Lista de Pautas',
-    fields: [
-      {
-        name: 'titulo',
-        label: 'Título',
-        type: 'input',
-        dataType: 'string',
-        required: true,
-        maxLength: 100,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      },
-      {
-        name: 'descricao',
-        label: 'Descrição',
-        type: 'textarea',
-        dataType: 'string',
-        required: true,
-        maxLength: 500,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: true,
-      edit: true,
-      delete: true
-    }
-  };
-
-  constructor(private pautaService: PautaService, private router: Router) {}
+  constructor(private pautaService: PautaService) {}
 
   ngOnInit(): void {
     this.loadPautas();
@@ -1434,41 +1396,17 @@ export class PautaListComponent implements OnInit {
     });
   }
 
-  createPauta(data: PautaRequestDTO): void {
-    this.isLoading = true;
-    this.pautaService.create(data).subscribe({
-      next: () => this.loadPautas(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao criar pauta';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  updatePauta(event: { id: number, data: PautaRequestDTO }): void {
-    this.isLoading = true;
-    this.pautaService.update(event.id, event.data).subscribe({
-      next: () => this.loadPautas(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao atualizar pauta';
-        this.isLoading = false;
-      }
-    });
-  }
-
   deletePauta(id: number): void {
-    this.isLoading = true;
-    this.pautaService.delete(id).subscribe({
-      next: () => this.loadPautas(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao deletar pauta';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  viewPauta(item: PautaResponseDTO): void {
-    this.router.navigate([`/pautas/${item.id}`]);
+    if (confirm('Deseja excluir esta pauta?')) {
+      this.isLoading = true;
+      this.pautaService.delete(id).subscribe({
+        next: () => this.loadPautas(),
+        error: (err: ApiError) => {
+          this.error = err.message || 'Erro ao deletar pauta';
+          this.isLoading = false;
+        }
+      });
+    }
   }
 }
 
@@ -1478,15 +1416,54 @@ export class PautaListComponent implements OnInit {
 Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.html
 ==================================================
 
-<div class="sessao-form container-dark">
-  <app-dynamic-crud
-    [config]="config"
-    [initialData]="[sessao]"
-    [isLoading]="isLoading"
-    [error]="error"
-    (onCreate)="saveSessao($event)"
-    (onUpdate)="saveSessao($event.data)"
-  ></app-dynamic-crud>
+<div class="container-dark">
+  <h2>{{ isEditMode ? 'Editar Sessão' : 'Nova Sessão' }}</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <form [formGroup]="sessaoForm" (ngSubmit)="saveSessao()">
+    <div class="form-group">
+      <label for="pautaId">Pauta</label>
+      <select id="pautaId" formControlName="pautaId">
+        <option value="">Selecione uma pauta</option>
+        <option *ngFor="let pauta of pautas" [value]="pauta.id">{{ pauta.titulo }}</option>
+      </select>
+      <div class="error" *ngIf="sessaoForm.get('pautaId')?.invalid && sessaoForm.get('pautaId')?.touched">
+        <span>Pauta é obrigatória</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dataAbertura">Data e Hora de Abertura</label>
+      <input
+        id="dataAbertura"
+        formControlName="dataAbertura"
+        type="datetime-local"
+      />
+      <div class="error" *ngIf="sessaoForm.get('dataAbertura')?.invalid && sessaoForm.get('dataAbertura')?.touched">
+        <span>Data de abertura é obrigatória</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="duracao">Duração (minutos, opcional)</label>
+      <input
+        id="duracao"
+        formControlName="duracao"
+        type="number"
+        min="1"
+        placeholder="1 (padrão)"
+      />
+      <div class="error" *ngIf="sessaoForm.get('duracao')?.invalid && sessaoForm.get('duracao')?.touched">
+        <span>Duração deve ser maior que 0</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="btn-primary" [disabled]="sessaoForm.invalid || isLoading">Salvar</button>
+      <button type="button" class="btn-danger" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
 </div>
 
 
@@ -1495,31 +1472,12 @@ Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.html
 Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.scss
 ==================================================
 
-.sessao-form {
-  padding: 20px;
+.container-dark {
   max-width: 600px;
-  margin: 0 auto;
-  background: var(--background-dark);
-  color: var(--text-light);
 }
 
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: var(--text-light);
-}
-
-.error-message {
-  color: var(--error-color);
-  font-size: 14px;
-  margin-bottom: 15px;
-}
-
-.loading {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
+select, input[type="datetime-local"], input[type="number"] {
+  width: 100%;
 }
 
 
@@ -1560,12 +1518,10 @@ Arquivo: app\pages\sessoes\sessao-form\sessao-form.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { SessaoVotacaoService } from '../../../services/sessao-votacao.service';
 import { PautaService } from '../../../services/pauta.service';
-import { NotificationService } from '../../../shared/services/notification.service';
 import { SessaoVotacaoRequestDTO, SessaoVotacaoResponseDTO } from '../../../models/sessao-votacao.model';
 import { PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
@@ -1573,74 +1529,22 @@ import { ApiError } from '../../../models/api-error.model';
 @Component({
   selector: 'app-sessao-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './sessao-form.component.html',
   styleUrls: ['./sessao-form.component.scss']
 })
 export class SessaoFormComponent implements OnInit {
-
-
-  sessao: SessaoVotacaoRequestDTO | SessaoVotacaoResponseDTO = {
-    pautaId: 0,
-    dataAbertura: new Date().toISOString().slice(0, 16), // Data atual formatada para datetime-local
-    dataFechamento: undefined
-  };
+  sessaoForm: any;
   pautas: PautaResponseDTO[] = [];
   isLoading = false;
   error: string | null = null;
   isEditMode = false;
-
-  config: DynamicTableConfig = {
-    title: 'Gerenciar Sessão de Votação',
-    fields: [
-      {
-        name: 'pautaId',
-        label: 'Pauta',
-        type: 'dropdown',
-        dataType: 'number',
-        required: true,
-        options: [], // Será preenchido com pautas
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      },
-      {
-        name: 'dataAbertura',
-        label: 'Data e Hora de Abertura',
-        type: 'datetime-local',
-        dataType: 'date',
-        required: true,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      },
-      {
-        name: 'dataFechamento',
-        label: 'Data e Hora de Fechamento',
-        type: 'datetime-local',
-        dataType: 'date',
-        required: false,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: false,
-      edit: false,
-      delete: false
-    }
-  };
+  sessaoId: number | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private sessaoService: SessaoVotacaoService,
     private pautaService: PautaService,
-    private notificationService: NotificationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -1650,7 +1554,15 @@ export class SessaoFormComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
-      this.loadSessao(+id);
+    this.sessaoForm = this.fb.group({
+      pautaId: ['', Validators.required],
+      dataAbertura: ['', Validators.required],
+      duracao: ['']
+    });
+    this.loadPautas();
+      if (this.sessaoId !== null) {
+        this.loadSessao(this.sessaoId);
+      }
     }
   }
 
@@ -1659,10 +1571,6 @@ export class SessaoFormComponent implements OnInit {
     this.pautaService.getAll().subscribe({
       next: (pautas: PautaResponseDTO[]) => {
         this.pautas = pautas;
-        const pautaField = this.config.fields.find(f => f.name === 'pautaId');
-        if (pautaField) {
-          pautaField.options = pautas.map(p => p.titulo);
-        }
         this.isLoading = false;
       },
       error: (err: ApiError) => {
@@ -1676,11 +1584,10 @@ export class SessaoFormComponent implements OnInit {
     this.isLoading = true;
     this.sessaoService.getById(id).subscribe({
       next: (sessao: SessaoVotacaoResponseDTO) => {
-        this.sessao = {
-          ...sessao,
-          dataAbertura: new Date(sessao.dataAbertura).toISOString().slice(0, 16),
-          dataFechamento: sessao.dataFechamento ? new Date(sessao.dataFechamento).toISOString().slice(0, 16) : undefined
-        };
+        this.sessaoForm.patchValue({
+          pautaId: sessao.pautaId.toString(),
+          dataAbertura: new Date(sessao.dataAbertura).toISOString().slice(0, 16)
+        });
         this.isLoading = false;
       },
       error: (err: ApiError) => {
@@ -1690,41 +1597,38 @@ export class SessaoFormComponent implements OnInit {
     });
   }
 
-  saveSessao(data: SessaoVotacaoRequestDTO & { dataAbertura?: string, dataFechamento?: string }): void {
+  saveSessao(): void {
+    if (this.sessaoForm.invalid) return;
     this.isLoading = true;
 
-    // Validar que pautaId é válido
-    if (!data.pautaId || data.pautaId <= 0) {
-      this.error = 'Selecione uma pauta válida';
-      this.isLoading = false;
-      return;
-    }
+    const formValue = this.sessaoForm.value;
+    const dataAbertura = new Date(formValue.dataAbertura!);
+    let dataFechamento: string | undefined;
 
-    // Validar que dataFechamento é posterior a dataAbertura, se fornecida
-    if (data.dataFechamento && data.dataAbertura) {
-      const abertura = new Date(data.dataAbertura);
-      const fechamento = new Date(data.dataFechamento);
-      if (fechamento <= abertura) {
-        this.error = 'Data de fechamento deve ser posterior à data de abertura';
-        this.isLoading = false;
-        return;
+    if (formValue.duracao) {
+      const duracaoMinutos = parseInt(formValue.duracao, 10);
+      if (duracaoMinutos > 0) {
+        const fechamento = new Date(dataAbertura.getTime() + duracaoMinutos * 60 * 1000);
+        dataFechamento = fechamento.toISOString();
       }
+    } else {
+      // Default: 1 minuto
+      const fechamento = new Date(dataAbertura.getTime() + 1 * 60 * 1000);
+      dataFechamento = fechamento.toISOString();
     }
 
-    // Preparar dados para envio
     const sessaoData: SessaoVotacaoRequestDTO = {
-      pautaId: data.pautaId,
-      dataAbertura: data.dataAbertura,
-      dataFechamento: data.dataFechamento || undefined
+      pautaId: parseInt(formValue.pautaId!, 10),
+      dataAbertura: dataAbertura.toISOString(),
+      dataFechamento
     };
 
-    const action = this.isEditMode && (this.sessao as SessaoVotacaoResponseDTO).id
-      ? this.sessaoService.update((this.sessao as SessaoVotacaoResponseDTO).id, sessaoData)
+    const action = this.isEditMode && this.sessaoId
+      ? this.sessaoService.update(this.sessaoId, sessaoData)
       : this.sessaoService.create(sessaoData);
 
     action.subscribe({
       next: () => {
-        this.notificationService.showSuccess(this.isEditMode ? 'Sessão atualizada com sucesso!' : 'Sessão criada com sucesso!');
         this.isLoading = false;
         this.router.navigate(['/sessoes']);
       },
@@ -1734,6 +1638,10 @@ export class SessaoFormComponent implements OnInit {
       }
     });
   }
+
+  cancel(): void {
+    this.router.navigate(['/sessoes']);
+  }
 }
 
 
@@ -1742,19 +1650,39 @@ export class SessaoFormComponent implements OnInit {
 Arquivo: app\pages\sessoes\sessao-list\sessao-list.component.html
 ==================================================
 
-<!-- src/app/pages/sessoes/sessao-list/sessao-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="sessoes"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createSessao($event)"
-  (onUpdate)="updateSessao($event)"
-  (onRemove)="deleteSessao($event)"
-  (onLoadData)="loadSessoes()"
-  (onView)="viewSessao($event)"
->
-</app-dynamic-crud>
+<div class="container-dark">
+  <h2>Lista de Sessões</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <button class="btn-primary" routerLink="/sessoes/novo">Nova Sessão</button>
+
+  <table *ngIf="sessoes.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Pauta</th>
+        <th>Data de Abertura</th>
+        <th>Data de Fechamento</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sessao of sessoes">
+        <td>{{ getPautaTitulo(sessao.pautaId) }}</td>
+        <td>{{ sessao.dataAbertura | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ sessao.dataFechamento | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ isSessaoAberta(sessao) ? 'Aberta' : 'Encerrada' }}</td>
+        <td>
+          <button class="btn-primary" [routerLink]="['/sessoes', sessao.id]" *ngIf="isSessaoAberta(sessao)">Editar</button>
+          <button class="btn-danger" (click)="deleteSessao(sessao.id)">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!sessoes.length && !isLoading" class="no-data">Nenhuma sessão encontrada</div>
+</div>
 
 
 
@@ -1762,18 +1690,12 @@ Arquivo: app\pages\sessoes\sessao-list\sessao-list.component.html
 Arquivo: app\pages\sessoes\sessao-list\sessao-list.component.scss
 ==================================================
 
-/* src/app/pages/sessoes/sessao-list/sessao-list.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
+.container-dark {
+  max-width: 1200px;
 }
 
-app-dynamic-crud {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+button {
+  margin: 5px;
 }
 
 
@@ -1814,76 +1736,45 @@ Arquivo: app\pages\sessoes\sessao-list\sessao-list.component.ts
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { RouterModule } from '@angular/router';
 import { SessaoVotacaoService } from '../../../services/sessao-votacao.service';
-import { SessaoVotacaoRequestDTO, SessaoVotacaoResponseDTO } from '../../../models/sessao-votacao.model';
+import { PautaService } from '../../../services/pauta.service';
+import { SessaoVotacaoResponseDTO } from '../../../models/sessao-votacao.model';
+import { PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
 
 @Component({
   selector: 'app-sessao-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sessao-list.component.html',
   styleUrls: ['./sessao-list.component.scss']
 })
 export class SessaoListComponent implements OnInit {
   sessoes: SessaoVotacaoResponseDTO[] = [];
+  pautas: PautaResponseDTO[] = [];
   isLoading = false;
   error: string | null = null;
 
-  config: DynamicTableConfig = {
-    title: 'Lista de Sessões de Votação',
-    fields: [
-      {
-        name: 'pautaId',
-        label: 'ID da Pauta',
-        type: 'input',
-        dataType: 'number',
-        required: true,
-        minValue: 1,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      },
-      {
-        name: 'dataAbertura',
-        label: 'Data de Abertura',
-        type: 'date',
-        dataType: 'date',
-        required: true,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      },
-      {
-        name: 'dataFechamento',
-        label: 'Data de Fechamento',
-        type: 'date',
-        dataType: 'date',
-        required: true,
-        showInTable: true,
-        filterable: true,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: true,
-      edit: true,
-      delete: true
-    }
-  };
-
-  constructor(private sessaoService: SessaoVotacaoService, private router: Router) {}
+  constructor(
+    private sessaoService: SessaoVotacaoService,
+    private pautaService: PautaService
+  ) {}
 
   ngOnInit(): void {
+    this.loadPautas();
     this.loadSessoes();
+  }
+
+  loadPautas(): void {
+    this.pautaService.getAll().subscribe({
+      next: (pautas: PautaResponseDTO[]) => {
+        this.pautas = pautas;
+      },
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao carregar pautas';
+      }
+    });
   }
 
   loadSessoes(): void {
@@ -1900,41 +1791,26 @@ export class SessaoListComponent implements OnInit {
     });
   }
 
-  createSessao(data: SessaoVotacaoRequestDTO): void {
-    this.isLoading = true;
-    this.sessaoService.create(data).subscribe({
-      next: () => this.loadSessoes(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao criar sessão';
-        this.isLoading = false;
-      }
-    });
+  getPautaTitulo(pautaId: number): string {
+    const pauta = this.pautas.find(p => p.id === pautaId);
+    return pauta ? pauta.titulo : 'Pauta não encontrada';
   }
 
-  updateSessao(event: { id: number, data: SessaoVotacaoRequestDTO }): void {
-    this.isLoading = true;
-    this.sessaoService.update(event.id, event.data).subscribe({
-      next: () => this.loadSessoes(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao atualizar sessão';
-        this.isLoading = false;
-      }
-    });
+  isSessaoAberta(sessao: SessaoVotacaoResponseDTO): boolean {
+    return new Date(sessao.dataFechamento) > new Date();
   }
 
   deleteSessao(id: number): void {
-    this.isLoading = true;
-    this.sessaoService.delete(id).subscribe({
-      next: () => this.loadSessoes(),
-      error: (err: ApiError) => {
-        this.error = err.message || 'Erro ao deletar sessão';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  viewSessao(item: SessaoVotacaoResponseDTO): void {
-    this.router.navigate([`/sessoes/${item.id}`]);
+    if (confirm('Deseja excluir esta sessão?')) {
+      this.isLoading = true;
+      this.sessaoService.delete(id).subscribe({
+        next: () => this.loadSessoes(),
+        error: (err: ApiError) => {
+          this.error = err.message || 'Erro ao deletar sessão';
+          this.isLoading = false;
+        }
+      });
+    }
   }
 }
 
@@ -1944,64 +1820,58 @@ export class SessaoListComponent implements OnInit {
 Arquivo: app\pages\votos\voto-form\voto-form.component.html
 ==================================================
 
-<div class="votacao-container container-dark">
+<div class="container-dark">
+  <h2>Votar em Sessão</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
   <!-- Modal CPF -->
   <div class="modal" *ngIf="showCpfModal">
     <div class="modal-content">
-      <h2>Informe seu CPF</h2>
+      <h3>Informe seu CPF</h3>
       <input
         type="text"
         [(ngModel)]="cpf"
         placeholder="Digite seu CPF"
-        mask="000.000.000-00"
-        maxlength="14"
-        class="form-control"
+        maxlength="11"
       />
-      <p class="error-text" *ngIf="cpfError">{{ cpfError }}</p>
-      <div class="modal-actions">
-        <button class="btn-primary" (click)="validarCpf()">Validar</button>
-        <button class="btn-danger" (click)="cpf = ''; cpfError = ''">Limpar</button>
-      </div>
+      <div class="error" *ngIf="cpfError">{{ cpfError }}</div>
+      <button class="btn-primary" (click)="validarCpf()">Validar</button>
     </div>
   </div>
 
-  <!-- Tabela de Sessões -->
-  <div class="sessoes-table" *ngIf="!showCpfModal">
-    <table class="voto-table">
+  <!-- Sessões Abertas -->
+  <div *ngIf="!showCpfModal && sessoes.length && !isLoading">
+    <table>
       <thead>
-      <tr>
-        <th>ID Sessão</th>
-        <th>Título da Pauta</th>
-        <th>Data Início</th>
-        <th>Data Fim</th>
-        <th>Tempo Restante</th>
-      </tr>
+        <tr>
+          <th>Pauta</th>
+          <th>Data de Início</th>
+          <th>Data de Fim</th>
+          <th>Tempo Restante</th>
+        </tr>
       </thead>
       <tbody>
-      <tr
-        *ngFor="let sessao of sessoes; let i = index"
-        [ngClass]="{'selected': sessao.id === selectedSessao?.id}"
-        (click)="selecionarSessao(sessao)"
-      >
-        <td>{{ sessao.id }}</td>
-        <td>{{ sessao.pautaTitulo }}</td>
-        <td>{{ sessao.dataInicio | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td>{{ sessao.dataFim | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td [ngStyle]="{'color': getTempoRestanteColor(timers[sessao.id], sessao.dataFim)}">
-          {{ timers[sessao.id] || 'Calculando...' }}
-        </td>
-      </tr>
+        <tr *ngFor="let sessao of sessoes" [class.selected]="selectedSessao?.id === sessao.id" (click)="selectSessao(sessao)">
+          <td>{{ sessao.pautaTitulo }}</td>
+          <td>{{ sessao.dataAbertura | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sessao.dataFechamento | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <app-timer [dataFechamento]="sessao.dataFechamento"></app-timer>
+          </td>
+        </tr>
       </tbody>
     </table>
 
-    <!-- Opções de Votação -->
-    <div class="votacao-opcoes" *ngIf="sessoes.length > 0 && selectedSessao">
-      <h3>Votar na Sessão: {{ selectedSessao.pautaTitulo }}</h3>
-      <button class="btn-success" (click)="votar('SIM')">Sim</button>
+    <div class="votacao-opcoes" *ngIf="selectedSessao">
+      <h3>Votar em: {{ selectedSessao.pautaTitulo }}</h3>
+      <button class="btn-primary" (click)="votar('SIM')">Sim</button>
       <button class="btn-danger" (click)="votar('NAO')">Não</button>
     </div>
-    <p class="error-text" *ngIf="cpfError">{{ cpfError }}</p>
-    <p class="no-data" *ngIf="sessoes.length === 0 && !cpfError">Nenhuma sessão aberta para votação.</p>
+  </div>
+
+  <div *ngIf="!showCpfModal && !sessoes.length && !isLoading" class="no-data">
+    Nenhuma sessão aberta para votação
   </div>
 </div>
 
@@ -2011,12 +1881,8 @@ Arquivo: app\pages\votos\voto-form\voto-form.component.html
 Arquivo: app\pages\votos\voto-form\voto-form.component.scss
 ==================================================
 
-.votacao-container {
+.container-dark {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
 }
 
 .modal {
@@ -2025,114 +1891,43 @@ Arquivo: app\pages\votos\voto-form\voto-form.component.scss
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .modal-content {
   background: var(--input-bg);
   padding: 20px;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
   text-align: center;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-
-  h2 {
-    color: var(--text-light);
-    margin-bottom: 15px;
-    font-size: 20px;
-  }
-
-  input {
-    width: 100%;
-    margin-bottom: 10px;
-    background: var(--input-bg);
-    color: var(--text-light);
-    border: 1px solid var(--border-color);
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
+  color: var(--text-light);
 }
 
-.error-text {
-  color: var(--error-color);
+.modal-content input {
+  padding: 8px;
   margin: 10px 0;
-  font-size: 12px;
+  width: 200px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
 }
 
-.sessoes-table {
-  margin-top: 20px;
+.modal-content .error {
+  color: var(--error-color);
+}
 
-  .voto-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--input-bg);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border: 1px solid var(--border-color);
-    color: var(--text-light);
-  }
-
-  th {
-    background: var(--header-color);
-    font-weight: bold;
-  }
-
-  tr {
-    cursor: pointer;
-  }
-
-  tr:hover {
-    background: var(--input-bg);
-  }
-
-  tr.selected {
-    background: var(--accent-orange);
-    color: var(--text-light);
-
-    td {
-      color: var(--text-light);
-    }
-  }
+table .selected {
+  background: var(--accent-orange);
 }
 
 .votacao-opcoes {
   margin-top: 20px;
   text-align: center;
-
-  h3 {
-    margin-bottom: 15px;
-    color: var(--text-light);
-    font-size: 18px;
-  }
-
-  button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 16px;
-  }
 }
 
-.no-data {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
+.votacao-opcoes button {
+  margin: 0 10px;
 }
 
 
@@ -2174,157 +1969,284 @@ Arquivo: app\pages\votos\voto-form\voto-form.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgxMaskDirective } from 'ngx-mask';
 import { VotoService } from '../../../services/voto.service';
-import { SessaoAberta } from '../../../models/sessao-votacao.model';
-import { interval, Subscription } from 'rxjs';
-import { NotificationService } from '../../../shared/services/notification.service';
+import { EleitorService } from '../../../services/eleitor.service';
+import { SessaoAbertaDTO } from '../../../models/voto.model';
+import { TimerComponent } from '../../../shared/components/timer/timer.component';
+import { Subscription } from 'rxjs';
+import { ApiError } from '../../../models/api-error.model';
 
 @Component({
   selector: 'app-voto-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxMaskDirective],
+  imports: [CommonModule, FormsModule, TimerComponent],
   templateUrl: './voto-form.component.html',
   styleUrls: ['./voto-form.component.scss']
 })
 export class VotoFormComponent implements OnInit, OnDestroy {
-  cpf: string = '';
-  showCpfModal: boolean = true;
-  cpfError: string = '';
-  sessoes: SessaoAberta[] = [];
-  selectedSessao: SessaoAberta | null = null;
-  timers: { [key: number]: string } = {};
-  private timerSubscription: Subscription | null = null;
+  cpf = '';
+  showCpfModal = true;
+  cpfError = '';
+  sessoes: SessaoAbertaDTO[] = [];
+  selectedSessao: SessaoAbertaDTO | null = null;
+  isLoading = false;
+  error: string | null = null;
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private votoService: VotoService,
-    private notificationService: NotificationService
+    private eleitorService: EleitorService
   ) {}
 
-  ngOnInit(): void {
-    console.log('VotoFormComponent inicializado');
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
+    this.subscription.unsubscribe();
   }
 
   validarCpf(): void {
-    console.log('Validando CPF:', this.cpf);
-    const cleanCpf = this.cpf.replace(/[^\d]/g, '');
-    if (cleanCpf.length !== 11) {
-      this.cpfError = 'CPF deve conter 11 dígitos';
-      return;
-    }
-
-    this.votoService.validarCpf(cleanCpf).subscribe({
-      next: (isValid) => {
-        console.log('Resposta da validação:', isValid);
-        if (isValid) {
-          this.cpfError = '';
-          this.carregarSessoes(cleanCpf);
+    this.isLoading = true;
+    this.cpfError = '';
+    this.eleitorService.validarCpf(this.cpf).subscribe({
+      next: (response) => {
+        if (response.status === 'ABLE_TO_VOTE') {
+          this.carregarSessoes();
           this.showCpfModal = false;
         } else {
-          this.cpfError = 'CPF inválido ou não habilitado para votação';
+          this.cpfError = 'CPF não autorizado para votar';
+          this.isLoading = false;
         }
       },
       error: (err) => {
-        console.error('Erro ao validar CPF:', err);
-        this.cpfError = err.error?.message || 'Erro ao validar CPF';
+        this.cpfError = err.status === 404 ? 'CPF inválido' : 'Erro ao validar CPF';
+        this.isLoading = false;
       }
     });
   }
 
-  carregarSessoes(cpf: string): void {
-    console.log('Carregando sessões para CPF:', cpf);
-    this.votoService.listarSessoesAbertasSemVoto(cpf).subscribe({
-      next: (sessoes: SessaoAberta[]) => {
-        console.log('Sessões carregadas:', sessoes);
+  carregarSessoes(): void {
+    this.isLoading = true;
+    this.votoService.getSessoesAbertasNaoVotadas(this.cpf).subscribe({
+      next: (sessoes: SessaoAbertaDTO[]) => {
         this.sessoes = sessoes;
-        if (sessoes.length > 0) {
-          this.selectedSessao = sessoes[0];
-        } else {
-          this.cpfError = 'Nenhuma sessão aberta para votação';
-        }
-        this.startTimer();
+        this.selectedSessao = sessoes.length > 0 ? sessoes[0] : null;
+        this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Erro ao carregar sessões:', err);
-        this.cpfError = err.error?.message || 'Erro ao carregar sessões';
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao carregar sessões';
+        this.isLoading = false;
       }
     });
   }
 
-  selecionarSessao(sessao: SessaoAberta): void {
-    console.log('Sessão selecionada:', sessao);
+  selectSessao(sessao: SessaoAbertaDTO): void {
     this.selectedSessao = sessao;
   }
 
-  startTimer(): void {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
-    }
-    this.timerSubscription = interval(1000).subscribe(() => {
-      const now = new Date();
-      this.sessoes.forEach((sessao) => {
-        const dataFim = new Date(sessao.dataFim);
-        if (isNaN(dataFim.getTime())) {
-          this.timers[sessao.id] = 'Data inválida';
-          return;
-        }
-        const diffMs = dataFim.getTime() - now.getTime();
-        if (diffMs <= 0) {
-          this.timers[sessao.id] = 'Encerrada';
-          this.sessoes = this.sessoes.filter(s => s.id !== sessao.id);
-          if (this.selectedSessao?.id === sessao.id) {
-            this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
-          }
-        } else {
-          const hours = Math.floor(diffMs / (1000 * 60 * 60));
-          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-          this.timers[sessao.id] = `${hours}h ${minutes}m ${seconds}s`;
-        }
-      });
-    });
-  }
-
-  getTempoRestanteColor(tempo: string, dataFim: string): string {
-    if (tempo === 'Encerrada' || tempo === 'Data inválida') return 'var(--error-color)';
-    const diffMs = new Date(dataFim).getTime() - new Date().getTime();
-    if (diffMs <= 60 * 1000) return 'var(--error-color)';
-    if (diffMs <= 30 * 60 * 1000) return '#FF7043';
-    if (diffMs <= 60 * 60 * 1000) return '#FFCA28';
-    return '#66BB6A';
-  }
-
   votar(voto: 'SIM' | 'NAO'): void {
-    console.log('Registrando voto:', voto);
-    if (!this.selectedSessao) {
-      this.cpfError = 'Nenhuma sessão selecionada';
-      return;
-    }
+    if (!this.selectedSessao) return;
+    this.isLoading = true;
     const votoRequest = {
       pautaId: this.selectedSessao.pautaId,
-      cpf: this.cpf.replace(/[^\d]/g, ''),
-      voto: voto
+      cpf: this.cpf,
+      voto
     };
     this.votoService.votar(votoRequest).subscribe({
       next: () => {
-        this.notificationService.showSuccess('Voto registrado com sucesso!');
         this.sessoes = this.sessoes.filter(s => s.id !== this.selectedSessao!.id);
         this.selectedSessao = this.sessoes.length > 0 ? this.sessoes[0] : null;
-        if (this.sessoes.length === 0) {
-          this.cpfError = 'Nenhuma sessão aberta para votação';
-        }
+        this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Erro ao registrar voto:', err);
-        this.cpfError = err.error?.message || 'Erro ao registrar voto';
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao registrar voto';
+        this.isLoading = false;
       }
     });
+  }
+}
+
+
+
+==================================================
+Arquivo: app\pages\votos\voto-list\voto-list.component.html
+==================================================
+
+<div class="container-dark">
+  <h2>Lista de Votos</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <div class="filter">
+    <label for="pautaId">Filtrar por Pauta:</label>
+    <select id="pautaId" [(ngModel)]="selectedPautaId" (change)="loadVotos()">
+      <option value="">Todas as pautas</option>
+      <option *ngFor="let pauta of pautas" [value]="pauta.id">{{ pauta.titulo }}</option>
+    </select>
+  </div>
+
+  <table *ngIf="votos.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Pauta</th>
+        <th>CPF</th>
+        <th>Voto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let voto of votos">
+        <td>{{ getPautaTitulo(voto.pautaId) }}</td>
+        <td>{{ voto.cpf }}</td>
+        <td>{{ voto.voto }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="resultado && selectedPautaId" class="resultado">
+    <h3>Resultado da Pauta: {{ getPautaTitulo(+selectedPautaId) }}</h3>
+    <p>Votos Sim: {{ resultado.votosSim }}</p>
+    <p>Votos Não: {{ resultado.votosNao }}</p>
+  </div>
+
+  <div *ngIf="!votos.length && !isLoading" class="no-data">Nenhum voto encontrado</div>
+</div>
+
+
+
+==================================================
+Arquivo: app\pages\votos\voto-list\voto-list.component.scss
+==================================================
+
+.container-dark {
+  max-width: 1200px;
+}
+
+.filter {
+  margin-bottom: 20px;
+}
+
+.resultado {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+
+
+==================================================
+Arquivo: app\pages\votos\voto-list\voto-list.component.spec.ts
+==================================================
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { VotoListComponent } from './voto-list.component';
+
+describe('VotoListComponent', () => {
+  let component: VotoListComponent;
+  let fixture: ComponentFixture<VotoListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [VotoListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(VotoListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+
+==================================================
+Arquivo: app\pages\votos\voto-list\voto-list.component.ts
+==================================================
+
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { VotoService } from '../../../services/voto.service';
+import { PautaService } from '../../../services/pauta.service';
+import { VotoResponseDTO, ResultadoResponseDTO } from '../../../models/voto.model';
+import { PautaResponseDTO } from '../../../models/pauta.model';
+import { ApiError } from '../../../models/api-error.model';
+
+@Component({
+  selector: 'app-voto-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './voto-list.component.html',
+  styleUrls: ['./voto-list.component.scss']
+})
+export class VotoListComponent implements OnInit {
+  votos: VotoResponseDTO[] = [];
+  pautas: PautaResponseDTO[] = [];
+  selectedPautaId: string = '';
+  resultado: ResultadoResponseDTO | null = null;
+  isLoading = false;
+  error: string | null = null;
+
+  constructor(
+    private votoService: VotoService,
+    private pautaService: PautaService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadPautas();
+    this.loadVotos();
+  }
+
+  loadPautas(): void {
+    this.pautaService.getAll().subscribe({
+      next: (pautas: PautaResponseDTO[]) => {
+        this.pautas = pautas;
+      },
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao carregar pautas';
+      }
+    });
+  }
+
+  loadVotos(): void {
+    this.isLoading = true;
+    const pautaId = this.selectedPautaId ? parseInt(this.selectedPautaId) : undefined;
+    this.votoService.getAll(pautaId).subscribe({
+      next: (votos: VotoResponseDTO[]) => {
+        this.votos = votos;
+        this.loadResultado();
+        this.isLoading = false;
+      },
+      error: (err: ApiError) => {
+        this.error = err.message || 'Erro ao carregar votos';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadResultado(): void {
+    if (this.selectedPautaId) {
+      this.votoService.getResultado(parseInt(this.selectedPautaId)).subscribe({
+        next: (resultado: ResultadoResponseDTO) => {
+          this.resultado = resultado;
+        },
+        error: (err: ApiError) => {
+          this.error = err.message || 'Erro ao carregar resultado';
+        }
+      });
+    } else {
+      this.resultado = null;
+    }
+  }
+
+  getPautaTitulo(pautaId: number): string {
+    const pauta = this.pautas.find(p => p.id === pautaId);
+    return pauta ? pauta.titulo : 'Pauta não encontrada';
   }
 }
 
@@ -2482,49 +2404,18 @@ Arquivo: app\services\voto.service.ts
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {Observable, tap} from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { VotoRequestDTO, VotoResponseDTO, ResultadoResponseDTO, SessaoAbertaDTO } from '../models/voto.model';
-import { SessaoAberta } from '../models/sessao-votacao.model';
-
-interface ValidarCpfResponse {
-  status: 'ABLE_TO_VOTE' | 'UNABLE_TO_VOTE';
-  message?: string;
-}
+import {SessaoAberta} from '../models/sessao-votacao.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VotoService {
   private apiUrl = `${environment.apiUrl}/votos`;
-  private eleitorUrl = `${environment.apiUrl}/votos`; // Alterado para /votos
 
   constructor(private http: HttpClient) {}
-
-  validarCpf(cpf: string): Observable<boolean> {
-    console.log('Enviando requisição para validar CPF:', cpf);
-    return this.http.post<boolean>(`${this.eleitorUrl}/validar-cpf`, cpf, {
-      headers: { 'Content-Type': 'application/json' }
-    }).pipe(
-      tap((response: any) => console.log('Resposta do backend:', response)),
-      map(isValid => {
-        const response: ValidarCpfResponse = {
-          status: isValid ? 'ABLE_TO_VOTE' : 'UNABLE_TO_VOTE',
-          message: isValid ? 'CPF válido' : 'CPF inválido'
-        };
-        return response.status === 'ABLE_TO_VOTE';
-      })
-    );
-  }
-
-  listarSessoesAbertasSemVoto(cpf: string): Observable<SessaoAberta[]> {
-    return this.http.get<SessaoAberta[]>(`${this.apiUrl}/sessoes-abertas-sem-voto/${cpf}`);
-  }
-
-  votar(voto: VotoRequestDTO): Observable<VotoResponseDTO> {
-    return this.http.post<VotoResponseDTO>(this.apiUrl, voto);
-  }
 
   create(voto: VotoRequestDTO): Observable<VotoResponseDTO> {
     return this.http.post<VotoResponseDTO>(this.apiUrl, voto);
@@ -2553,6 +2444,18 @@ export class VotoService {
 
   getSessoesAbertasNaoVotadas(cpf: string): Observable<SessaoAbertaDTO[]> {
     return this.http.get<SessaoAbertaDTO[]>(`${this.apiUrl}/sessoes-abertas?cpf=${cpf}`);
+  }
+
+  validarCpf(cpf: string): Observable<boolean> {
+    return this.http.post<boolean>(`${this.apiUrl}/validar-cpf`, cpf);
+  }
+
+  listarSessoesAbertasSemVoto(cpf: string): Observable<SessaoAberta[]> {
+    return this.http.get<SessaoAberta[]>(`${this.apiUrl}/sessoes-abertas-sem-voto/${cpf}`);
+  }
+
+  votar(voto: { pautaId: number; cpf: string; voto: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, voto);
   }
 }
 
@@ -2911,538 +2814,6 @@ export class TimerComponent implements OnInit, OnDestroy {
 
 
 ==================================================
-Arquivo: app\shared\dynamic-crud\dynamic-crud.component.html
-==================================================
-
-<div class="dynamic-crud-container">
-  <h2>{{ config?.title }}</h2>
-
-  <div *ngIf="notification" class="notification">{{ notification }}</div>
-  <div *ngIf="error" class="error-message">{{ error }}</div>
-  <div *ngIf="isLoading" class="loading">Carregando...</div>
-
-  <button *ngIf="!showForm" (click)="toggleForm()" class="toggle-form-btn">Adicionar Novo</button>
-
-  <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="onSubmit()" class="crud-form">
-    <div *ngFor="let field of config?.fields" class="form-field">
-      <label for="{{ field.name }}">{{ field.label }}</label>
-
-      <input
-        *ngIf="field.type === 'input' && field.dataType !== 'number'"
-        [formControlName]="field.name"
-        [id]="field.name"
-        [type]="field.dataType"
-        [placeholder]="field.label"
-        [mask]="field.mask || ''"
-        [disabled]="field.disabled"
-      />
-
-      <input
-        *ngIf="field.type === 'input' && field.dataType === 'number'"
-        [formControlName]="field.name"
-        [id]="field.name"
-        type="number"
-        [placeholder]="field.label"
-        [disabled]="field.disabled"
-      />
-
-      <textarea
-        *ngIf="field.type === 'textarea'"
-        [formControlName]="field.name"
-        [id]="field.name"
-        [placeholder]="field.label"
-        [disabled]="field.disabled"
-      ></textarea>
-
-      <select
-        *ngIf="field.type === 'dropdown'"
-        [formControlName]="field.name"
-        [id]="field.name"
-        [disabled]="field.disabled"
-      >
-        <option *ngFor="let option of field.options" [value]="option">{{ option }}</option>
-      </select>
-
-      <input
-        *ngIf="field.type === 'date'"
-        [formControlName]="field.name"
-        [id]="field.name"
-        type="date"
-        [disabled]="field.disabled"
-      />
-
-      <div class="error" *ngIf="form.get(field.name)?.invalid && form.get(field.name)?.touched">
-        <span *ngIf="form.get(field.name)?.errors?.['required']">{{ field.label }} é obrigatório</span>
-        <span *ngIf="form.get(field.name)?.errors?.['pattern']">Formato inválido</span>
-        <span *ngIf="form.get(field.name)?.errors?.['invalidCpf']">CPF inválido</span>
-        <span *ngIf="form.get(field.name)?.errors?.['min']">{{ field.label }} deve ser maior que {{ field.minValue }}</span>
-        <span *ngIf="form.get(field.name)?.errors?.['maxLength']">
-          {{ field.label }} deve ter no máximo {{ field.maxLength }} caracteres
-        </span>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" [disabled]="form.invalid" class="btn-primary">Salvar</button>
-      <button type="button" (click)="resetForm()" class="btn-danger">Cancelar</button>
-    </div>
-  </form>
-
-  <div *ngIf="hasFilterableFields" class="filters">
-    <div *ngFor="let field of config?.fields" class="filter-field">
-      <input
-        *ngIf="field.filterable"
-        [placeholder]="'Filtrar por ' + field.label"
-        (input)="updateFilter(field.name, $event)"
-      />
-    </div>
-  </div>
-
-  <table *ngIf="config && filteredData.length && !isLoading" class="crud-table">
-    <thead>
-    <tr>
-      <th *ngFor="let field of config.fields" [hidden]="!field.showInTable">{{ field.label }}</th>
-      <th *ngIf="config.actions.view || config.actions.edit || config.actions.delete">Ações</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let item of filteredData">
-      <td *ngFor="let field of config.fields" [hidden]="!field.showInTable">
-        {{ getFieldValue(item, field.name) }}
-      </td>
-      <td *ngIf="config.actions.view || config.actions.edit || config.actions.delete">
-        <button *ngIf="config.actions.view" (click)="viewItem(item)" class="btn-primary">Visualizar</button>
-        <button *ngIf="config.actions.edit && hasId(item)" (click)="editItem(item)" class="btn-primary">Editar</button>
-        <button *ngIf="config.actions.delete && hasId(item)" (click)="deleteItem(item.id)" class="btn-danger">Excluir</button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-
-  <div *ngIf="!filteredData.length && !isLoading" class="no-data">Nenhum dado encontrado</div>
-</div>
-
-
-
-==================================================
-Arquivo: app\shared\dynamic-crud\dynamic-crud.component.scss
-==================================================
-
-@use 'sass:color';
-
-$primary-blue: #007acc; // Mantido para color.adjust
-
-.dynamic-crud-container {
-  background: var(--background-dark);
-  color: var(--text-light);
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: var(--text-light);
-}
-
-.notification {
-  background: #28a745;
-  color: var(--text-light);
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.error-message {
-  color: var(--error-color);
-  font-size: 12px;
-  margin-bottom: 15px;
-}
-
-.loading {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
-}
-
-.toggle-form-btn {
-  background-color: var(--primary-blue);
-  color: var(--text-light);
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 15px;
-}
-
-.toggle-form-btn:hover {
-  background-color: color.adjust($primary-blue, $lightness: -10%);
-}
-
-.crud-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--input-bg);
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.form-field label {
-  font-weight: bold;
-  color: var(--text-light);
-}
-
-.form-field input,
-.form-field textarea,
-.form-field select {
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 14px;
-  background: var(--input-bg);
-  color: var(--text-light);
-}
-
-.form-field input:focus,
-.form-field textarea:focus,
-.form-field select:focus {
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.25rem rgba(0, 122, 204, 0.25);
-}
-
-.form-field input:disabled,
-.form-field textarea:disabled,
-.form-field select:disabled {
-  background-color: #f5f5f5;
-}
-
-.form-field .error {
-  color: var(--error-color);
-  font-size: 12px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.filters {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.filter-field input {
-  padding: 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 14px;
-  background: var(--input-bg);
-  color: var(--text-light);
-}
-
-.crud-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--input-bg);
-}
-
-.crud-table th,
-.crud-table td {
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  text-align: left;
-  color: var(--text-light);
-}
-
-.crud-table th {
-  background-color: var(--header-color);
-  font-weight: bold;
-}
-
-.crud-table button {
-  margin-right: 5px;
-}
-
-.no-data {
-  text-align: center;
-  font-size: 16px;
-  margin: 20px 0;
-  color: var(--text-light);
-}
-
-
-
-==================================================
-Arquivo: app\shared\dynamic-crud\dynamic-crud.component.spec.ts
-==================================================
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { DynamicCrudComponent } from './dynamic-crud.component';
-
-describe('DynamicCrudComponent', () => {
-  let component: DynamicCrudComponent;
-  let fixture: ComponentFixture<DynamicCrudComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [DynamicCrudComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(DynamicCrudComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-
-==================================================
-Arquivo: app\shared\dynamic-crud\dynamic-crud.component.ts
-==================================================
-
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
-import { NgxMaskDirective } from 'ngx-mask';
-import { NotificationService } from '../services/notification.service';
-
-export interface FieldConfig {
-  name: string;
-  label: string;
-  type: 'input' | 'textarea' | 'dropdown' | 'date' | 'datetime-local' | 'checkbox' | 'radio' | 'switch';
-  dataType: 'string' | 'number' | 'date';
-  required?: boolean;
-  maxLength?: number;
-  minValue?: number;
-  pattern?: RegExp;
-  mask?: string;
-  options?: string[];
-  showInTable?: boolean;
-  filterable?: boolean;
-  disabled: boolean;
-  defaultValue?: any;
-}
-
-export interface DynamicTableConfig {
-  title: string;
-  fields: FieldConfig[];
-  actions: {
-    view: boolean;
-    edit: boolean;
-    delete: boolean;
-  };
-}
-
-export function cpfValidator(): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: any } | null => {
-    const cpf = control.value?.replace(/[^\d]/g, '');
-    if (!cpf || cpf.length !== 11) return { invalidCpf: true };
-
-    let sum = 0;
-    let remainder;
-    for (let i = 1; i <= 9; i++) {
-      sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
-    }
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cpf.substring(9, 10))) return { invalidCpf: true };
-
-    sum = 0;
-    for (let i = 1; i <= 10; i++) {
-      sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
-    }
-    remainder = (sum * 10) % 11;
-    if (remainder === 10 || remainder === 11) remainder = 0;
-    if (remainder !== parseInt(cpf.substring(10, 11))) return { invalidCpf: true };
-
-    return null;
-  };
-}
-
-@Component({
-  selector: 'app-dynamic-crud',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective],
-  templateUrl: './dynamic-crud.component.html',
-  styleUrls: ['./dynamic-crud.component.scss']
-})
-export class DynamicCrudComponent<T extends Record<string, any>> implements OnInit {
-  @Input() config: DynamicTableConfig | null = null;
-  @Input() initialData: T[] = [];
-  @Input() isLoading = false;
-  @Input() error: string | null = null;
-  @Output() onCreate = new EventEmitter<T>();
-  @Output() onUpdate = new EventEmitter<{ id: number, data: T }>();
-  @Output() onRemove = new EventEmitter<number>();
-  @Output() onLoadData = new EventEmitter<void>();
-  @Output() onView = new EventEmitter<T>();
-  @Output() onError = new EventEmitter<string>();
-
-  form: FormGroup;
-  isEditMode = false;
-  currentEditId: number | null = null;
-  showForm = false;
-  filteredData: T[] = [];
-  filterValues: { [key: string]: any } = {};
-  notification: string | null = null;
-  hasFilterableFields = false;
-
-  constructor(
-    private fb: FormBuilder,
-    private notificationService: NotificationService
-  ) {
-    this.form = this.fb.group({});
-    this.notificationService.getNotification().subscribe(notification => {
-      this.notification = notification;
-    });
-  }
-
-  ngOnInit(): void {
-    if (this.config) {
-      this.initForms();
-      this.filteredData = [...this.initialData];
-      this.hasFilterableFields = this.config.fields.some(f => f.filterable ?? false);
-    }
-    this.onLoadData.emit();
-  }
-
-  private initForms(): void {
-    const formGroup: any = {};
-    this.config!.fields.forEach(field => {
-      const validators = [];
-      if (field.required) validators.push(Validators.required);
-      if (field.maxLength) validators.push(Validators.maxLength(field.maxLength));
-      if (field.pattern) validators.push(Validators.pattern(field.pattern));
-      if (field.minValue !== undefined) validators.push(Validators.min(field.minValue));
-      if (field.name === 'cpf') validators.push(cpfValidator());
-      formGroup[field.name] = [{ value: field.defaultValue || '', disabled: field.disabled }, validators];
-    });
-    this.form = this.fb.group(formGroup);
-  }
-
-  onSubmit(): void {
-    if (this.form.invalid) return;
-
-    const formData = this.form.value as T;
-    if (this.isEditMode && this.currentEditId !== null) {
-      this.onUpdate.emit({ id: this.currentEditId, data: formData }); // Emitindo id e dados
-      this.notificationService.showSuccess('Item atualizado com sucesso!');
-    } else {
-      this.onCreate.emit(formData);
-      this.notificationService.showSuccess('Item criado com sucesso!');
-    }
-    this.resetForm();
-  }
-
-  editItem(item: T): void {
-    if (!this.hasId(item)) {
-      this.onError.emit('Item sem ID não pode ser editado');
-      return;
-    }
-    this.isEditMode = true;
-    this.currentEditId = item['id'];
-    this.showForm = true;
-    this.form.patchValue(item);
-  }
-
-  deleteItem(id: number): void {
-    this.onRemove.emit(id);
-    this.notificationService.showSuccess('Item excluído com sucesso!');
-  }
-
-  viewItem(item: T): void {
-    this.onView.emit(item);
-  }
-
-  resetForm(): void {
-    this.form.reset();
-    this.isEditMode = false;
-    this.currentEditId = null;
-    this.showForm = false;
-  }
-
-  applyFilter(): void {
-    this.filteredData = this.initialData.filter(item => {
-      return Object.keys(this.filterValues).every(key => {
-        const value = this.filterValues[key];
-        if (!value) return true;
-        return String(item[key] ?? '').toLowerCase().includes(String(value).toLowerCase());
-      });
-    });
-  }
-
-  updateFilter(fieldName: string, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.filterValues[fieldName] = value;
-    this.applyFilter();
-  }
-
-  toggleForm(): void {
-    this.showForm = !this.showForm;
-    if (!this.showForm) this.resetForm();
-  }
-
-  getFieldValue(item: T, fieldName: string): any {
-    return item[fieldName] ?? '';
-  }
-
-  hasId(item: T): item is T & { id: number } {
-    return typeof item['id'] === 'number';
-  }
-}
-
-
-
-==================================================
-Arquivo: app\shared\services\notification.service.ts
-==================================================
-
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class NotificationService {
-  private notificationSubject = new BehaviorSubject<string | null>(null);
-
-  getNotification(): Observable<string | null> {
-    return this.notificationSubject.asObservable();
-  }
-
-  showSuccess(message: string): void {
-    this.notificationSubject.next(message);
-    setTimeout(() => this.notificationSubject.next(null), 3000);
-  }
-
-  showError(message: string): void {
-    this.notificationSubject.next(message);
-    setTimeout(() => this.notificationSubject.next(null), 3000);
-  }
-}
-
-
-
-==================================================
 Arquivo: environments\environment.prod.ts
 ==================================================
 
@@ -3465,7 +2836,7 @@ export const environment = {
 
 ==================================================
 Resumo:
-Total de arquivos processados: 66
+Total de arquivos processados: 65
 Arquivos com erro: 0
-Arquivos processados com sucesso: 66
+Arquivos processados com sucesso: 65
 ==================================================

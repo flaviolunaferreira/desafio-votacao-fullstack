@@ -19,13 +19,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.web.servlet.function.ServerResponse.ok;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/v1/votos")
 @RequiredArgsConstructor
 public class VotoController {
+
+    private static final Logger log = LoggerFactory.getLogger(VotoController.class);
 
     private final VotoService votoService;
 
@@ -187,10 +189,15 @@ public class VotoController {
     @GetMapping("/sessoes-abertas-sem-voto/{cpf}")
     @Operation(summary = "Lista sessões abertas sem voto", description = "Retorna as sessões abertas em que o eleitor ainda não votou")
     public ResponseEntity<List<SessaoAbertaResponseDTO>> listarSessoesAbertasSemVoto(@PathVariable String cpf) {
+        log.info("Recebendo requisição para listar sessões abertas sem voto para CPF: {}", cpf);
+
         if (cpf == null || cpf.trim().isEmpty() || !CpfValidation.isValid(cpf)) {
+            log.warn("CPF inválido: {}", cpf);
             return ResponseEntity.badRequest().body(null);
         }
+
         List<SessaoAbertaResponseDTO> sessoes = votoService.listarSessoesAbertasSemVoto(cpf);
+        log.info("Sessões retornadas para CPF {}: {}", cpf, sessoes.size());
         return ResponseEntity.ok(sessoes);
     }
 

@@ -1,71 +1,58 @@
-@use 'sass:color';
-
-// Variáveis do Bootstrap
-$primary: #007acc; // --primary-blue
-$body-bg: #1e1e1e; // --background-dark
-$body-color: #d4d4d4; // --text-light
-$input-bg: #252526; // --input-bg
-$border-color: #3c3c3c; // --border-color
-$header-color: #333333; // --header-color
-$sidebar-color: #272727; // --sidebar-color
-$btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d4d4d4'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707A1 1 0 01.293.293z'/%3e%3c/svg%3e");
-
-// Variáveis do projeto
-$text-light: #d4d4d4;
-$link-color: #3794ff;
-$primary-blue: #007acc;
-$accent-orange: #d19a66;
-$error-color: #f48771;
-$background-dark: #1e1e1e;
 
 :root {
-  --background-color: #242323;
-  --sidebar-color: #272727;
-  --text-color: #dfdfdf;
-  --border-color: #3c3c3c;
-  --scrollbar-color: #3c3c3c;
-  --scrollbar-thumb-color: #1d1d1d;
-  --header-color: #333333;
-  --footer-color: #333333;
-  --link-color: #3794ff;
-  --primary-color: #152d3d;
   --background-dark: #1e1e1e;
   --primary-blue: #007acc;
-  --accent-orange: #d19a66;
   --text-light: #d4d4d4;
   --input-bg: #252526;
+  --border-color: #3c3c3c;
   --error-color: #f48771;
+  --header-color: #333333;
+  --sidebar-color: #272727;
+  --link-color: #3794ff;
+  --accent-orange: #d19a66;
 }
 
-// Estilos globais
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: $body-bg;
-  color: $body-color;
+  background-color: var(--background-dark);
+  color: var(--text-light);
 }
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-// Classes utilitárias
 .container-dark {
-  background: $background-dark;
-  color: $text-light;
+  background: var(--background-dark);
+  color: var(--text-light);
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.error-text {
-  color: $error-color;
-  font-size: 12px;
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--text-light);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
 }
 
 .btn-primary {
-  background-color: $primary-blue;
-  color: $text-light;
+  background-color: var(--primary-blue);
+  color: var(--text-light);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -73,25 +60,12 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: color.adjust($primary-blue, $lightness: -10%);
-}
-
-.btn-success {
-  background-color: #28a745;
-  color: $text-light;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-success:hover {
-  background-color: color.adjust(#28a745, $lightness: -10%);
+  background-color: var(--primary-blue);
 }
 
 .btn-danger {
-  background-color: $error-color;
-  color: $text-light;
+  background-color: var(--error-color);
+  color: var(--text-light);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -99,67 +73,90 @@ body {
 }
 
 .btn-danger:hover {
-  background-color: color.adjust($error-color, $lightness: -10%);
+  background-color: --error-color;
 }
 
-// Estilizar barras de rolagem
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: $border-color;
-}
-::-webkit-scrollbar-thumb {
-  background: #1d1d1d;
-  border-radius: 4px;
-}
-
-// Ajustes para modais
-.modal-content {
-  background: $input-bg;
-  color: $text-light;
-  border: 1px solid $border-color;
-}
-.modal-header, .modal-footer {
-  border-color: $border-color;
-}
-.form-control {
-  background: $input-bg;
-  color: $text-light;
-  border-color: $border-color;
-}
-.form-control:focus {
-  background: $input-bg;
-  color: $text-light;
-  border-color: $primary-blue;
-  box-shadow: 0 0 0 0.25rem rgba(0, 122, 204, 0.25);
-}
-.invalid-feedback {
-  color: $error-color;
-}
-
-.sidebar {
-  background: var(--sidebar-color);
-  width: 250px;
-  min-height: 100vh;
-  padding: 20px;
-  border-right: 1px solid var(--border-color);
-}
-
-.header {
-  background: var(--primary-blue);
-  height: 60px;
+form {
   display: flex;
-  align-items: center;
-  padding: 0 20px;
+  flex-direction: column;
+  gap: 15px;
+  background: var(--input-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: bold;
   color: var(--text-light);
-  font-size: 20px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-light);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+}
+
+.form-group .error {
+  color: var(--error-color);
+  font-size: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--input-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  color: var(--text-light);
+}
+
+th {
+  background: var(--header-color);
   font-weight: bold;
 }
 
-.main {
-  background: var(--background-dark);
-  padding: 20px;
-  flex: 1;
+.no-data {
+  text-align: center;
+  font-size: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
 }
 
+@media (max-width: 768px) {
+  .container-dark {
+    padding: 10px;
+  }
+
+  form {
+    padding: 15px;
+  }
+
+  table th, table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}

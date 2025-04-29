@@ -1,13 +1,29 @@
-<!-- src/app/pages/pautas/pauta-list/pauta-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="pautas"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createPauta($event)"
-  (onUpdate)="updatePauta($event)"
-  (onRemove)="deletePauta($event)"
-  (onLoadData)="loadPautas()"
-  (onView)="viewPauta($event)"
->
-</app-dynamic-crud>
+<div class="container-dark">
+  <h2>Lista de Pautas</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <button class="btn-primary" routerLink="/pautas/novo">Nova Pauta</button>
+
+  <table *ngIf="pautas.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descrição</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pauta of pautas">
+        <td>{{ pauta.titulo }}</td>
+        <td>{{ pauta.descricao }}</td>
+        <td>
+          <button class="btn-primary" [routerLink]="['/pautas', pauta.id]">Editar</button>
+          <button class="btn-danger" (click)="deletePauta(pauta.id)">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!pautas.length && !isLoading" class="no-data">Nenhuma pauta encontrada</div>
+</div>

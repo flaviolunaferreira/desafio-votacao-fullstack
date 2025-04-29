@@ -34,7 +34,7 @@ public class SessaoVotacaoController {
                     content = @Content(mediaType = "application/json",
                             examples = {
                                     @ExampleObject(name = "Validação", value = "{\"message\": \"pautaId: O ID da pauta é obrigatório; duracao: A duração deve ser um número positivo\"}"),
-                                    @ExampleObject(name = "Sessão existente", value = "{\"message\": \"Sessão de votação já existe para a pauta: 1\"}")
+                                    @ExampleObject(name = "Sessão existente", value = "{\"message\": \"Já existe uma sessão de votação aberta para a pauta: 1\"}")
                             })),
             @ApiResponse(responseCode = "404", description = "Pauta não encontrada",
                     content = @Content(mediaType = "application/json",

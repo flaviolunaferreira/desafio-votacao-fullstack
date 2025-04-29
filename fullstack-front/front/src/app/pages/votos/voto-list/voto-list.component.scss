@@ -1,13 +1,15 @@
-/* src/app/pages/votos/voto-list/voto-list.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
+.container-dark {
+  max-width: 1200px;
 }
 
-app-dynamic-crud {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+.filter {
+  margin-bottom: 20px;
+}
+
+.resultado {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
 }

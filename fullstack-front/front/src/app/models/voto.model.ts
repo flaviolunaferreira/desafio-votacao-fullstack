@@ -1,7 +1,7 @@
 export interface VotoRequestDTO {
-  pautaId: number;
+  sessaoId: number;
   cpf: string;
-  voto: 'SIM' | 'NAO';
+  voto: boolean;
 }
 
 export interface VotoResponseDTO {

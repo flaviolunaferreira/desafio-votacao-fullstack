@@ -5,6 +5,7 @@ import { PautaFormComponent } from './pages/pautas/pauta-form/pauta-form.compone
 import { SessaoListComponent } from './pages/sessoes/sessao-list/sessao-list.component';
 import { SessaoFormComponent } from './pages/sessoes/sessao-form/sessao-form.component';
 import { VotoFormComponent } from './pages/votos/voto-form/voto-form.component';
+import { VotoListComponent } from './pages/votos/voto-list/voto-list.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
@@ -16,7 +17,7 @@ export const routes: Routes = [
   { path: 'sessoes', component: SessaoListComponent },
   { path: 'sessoes/novo', component: SessaoFormComponent },
   { path: 'sessoes/:id', component: SessaoFormComponent },
+  { path: 'votos', component: VotoListComponent },
   { path: 'votos/novo', component: VotoFormComponent },
-  { path: 'votos/:id', component: VotoFormComponent },
   { path: '**', component: NotFoundComponent }
 ];

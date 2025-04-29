@@ -1,13 +1,3 @@
-/* src/app/pages/pautas/pauta-form/pauta-form.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
-}
-
-app-dynamic-crud {
-  width: 100%;
+.container-dark {
   max-width: 600px;
-  margin: 0 auto;
 }

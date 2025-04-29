@@ -16,21 +16,30 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 @Validated
 public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
 
+    Logger log = LoggerFactory.getLogger(this.getClass());
     private final SessaoVotacaoRepository sessaoVotacaoRepository;
     private final PautaRepository pautaRepository;
 
+
     @Override
     public SessaoVotacaoResponseDTO abrirSessao(SessaoVotacaoRequestDTO requestDTO) {
+        log.info("Iniciando abertura de sessão para pautaId: {}", requestDTO.getPautaId());
+
         Pauta pauta = pautaRepository.findById(requestDTO.getPautaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada: " + requestDTO.getPautaId()));
 
-        if (sessaoVotacaoRepository.findByPautaId(requestDTO.getPautaId()) != null) {
+        // Verificar se existe uma sessão aberta para a pauta
+        SessaoVotacao sessaoAberta = sessaoVotacaoRepository.findOpenByPautaId(requestDTO.getPautaId());
+        if (sessaoAberta != null) {
+            log.warn("Pauta {} já possui uma sessão aberta com ID: {}", requestDTO.getPautaId(), sessaoAberta.getId());
             throw new BusinessException("Já existe uma sessão de votação aberta para a pauta: " + requestDTO.getPautaId());
         }
 
@@ -44,8 +53,19 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
         sessao.setDataAbertura(dataAbertura);
         sessao.setDataFechamento(dataFechamento);
 
-        sessao = sessaoVotacaoRepository.save(sessao);
-        return toResponseDTO(sessao);
+        log.info("Salvando sessão para pautaId: {}", requestDTO.getPautaId());
+        try {
+            sessao = sessaoVotacaoRepository.save(sessao);
+            log.info("Sessão salva com sucesso: {}", sessao.getId());
+        } catch (Exception e) {
+            log.error("Erro ao salvar sessão para pautaId: {}", requestDTO.getPautaId(), e);
+            throw new RuntimeException("Erro ao salvar a sessão: " + e.getMessage(), e);
+        }
+
+        log.info("Convertendo sessão para DTO: {}", sessao.getId());
+        SessaoVotacaoResponseDTO responseDTO = toResponseDTO(sessao);
+        log.info("Sessão convertida para DTO com sucesso");
+        return responseDTO;
     }
 
     @Override
@@ -92,9 +112,12 @@ public class SessaoVotacaoServiceImpl implements SessaoVotacaoService {
     }
 
     private SessaoVotacaoResponseDTO toResponseDTO(SessaoVotacao sessao) {
+        if (sessao == null) {
+            throw new IllegalArgumentException("Sessão não pode ser nula");
+        }
         SessaoVotacaoResponseDTO dto = new SessaoVotacaoResponseDTO();
         dto.setId(sessao.getId());
-        dto.setPautaId(sessao.getPauta().getId());
+        dto.setPautaId(sessao.getPauta() != null ? sessao.getPauta().getId() : null);
         dto.setDataAbertura(sessao.getDataAbertura());
         dto.setDataFechamento(sessao.getDataFechamento());
         return dto;

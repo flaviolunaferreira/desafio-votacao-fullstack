@@ -1,10 +1,52 @@
-<div class="sessao-form container-dark">
-  <app-dynamic-crud
-    [config]="config"
-    [initialData]="[sessao]"
-    [isLoading]="isLoading"
-    [error]="error"
-    (onCreate)="saveSessao($event)"
-    (onUpdate)="saveSessao($event.data)"
-  ></app-dynamic-crud>
+<div class="sessao-form">
+  <h2>{{ isEditMode ? 'Editar Sessão' : 'Nova Sessão' }}</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <form [formGroup]="sessaoForm" (ngSubmit)="saveSessao()">
+    <div class="form-group">
+      <label for="pautaId">Pauta</label>
+      <select id="pautaId" formControlName="pautaId" [class.invalid]="sessaoForm.get('pautaId')?.touched && sessaoForm.get('pautaId')?.invalid">
+        <option value="" disabled>Selecione uma pauta</option>
+        <option *ngFor="let pauta of pautas" [value]="pauta.id">{{ pauta.titulo }}</option>
+      </select>
+      <div *ngIf="sessaoForm.get('pautaId')?.touched && sessaoForm.get('pautaId')?.hasError('required')" class="error">
+        A pauta é obrigatória
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dataAbertura">Data de Abertura</label>
+      <input
+        id="dataAbertura"
+        type="datetime-local"
+        formControlName="dataAbertura"
+        [class.invalid]="sessaoForm.get('dataAbertura')?.touched && sessaoForm.get('dataAbertura')?.invalid"
+      />
+      <div *ngIf="sessaoForm.get('dataAbertura')?.touched && sessaoForm.get('dataAbertura')?.hasError('required')" class="error">
+        A data de abertura é obrigatória
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="duracao">Duração (minutos)</label>
+      <input
+        id="duracao"
+        type="number"
+        formControlName="duracao"
+        placeholder="Padrão: 1 minuto"
+        [class.invalid]="sessaoForm.get('duracao')?.touched && sessaoForm.get('duracao')?.hasError('min')"
+      />
+      <div *ngIf="sessaoForm.get('duracao')?.touched && sessaoForm.get('duracao')?.hasError('min')" class="error">
+        A duração deve ser maior que 0
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button type="submit" [disabled]="sessaoForm.invalid || isLoading">
+        {{ isEditMode ? 'Atualizar' : 'Criar' }}
+      </button>
+      <button type="button" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
 </div>

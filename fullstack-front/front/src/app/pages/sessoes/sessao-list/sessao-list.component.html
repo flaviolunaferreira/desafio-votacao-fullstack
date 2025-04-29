@@ -1,13 +1,33 @@
-<!-- src/app/pages/sessoes/sessao-list/sessao-list.component.html -->
-<app-dynamic-crud
-  [config]="config"
-  [initialData]="sessoes"
-  [isLoading]="isLoading"
-  [error]="error"
-  (onCreate)="createSessao($event)"
-  (onUpdate)="updateSessao($event)"
-  (onRemove)="deleteSessao($event)"
-  (onLoadData)="loadSessoes()"
-  (onView)="viewSessao($event)"
->
-</app-dynamic-crud>
+<div class="container-dark">
+  <h2>Lista de Sessões</h2>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="isLoading" class="loading">Carregando...</div>
+
+  <button class="btn-primary" routerLink="/sessoes/novo">Nova Sessão</button>
+
+  <table *ngIf="sessoes.length && !isLoading">
+    <thead>
+      <tr>
+        <th>Pauta</th>
+        <th>Data de Abertura</th>
+        <th>Data de Fechamento</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sessao of sessoes">
+        <td>{{ getPautaTitulo(sessao.pautaId) }}</td>
+        <td>{{ sessao.dataAbertura | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ sessao.dataFechamento | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ isSessaoAberta(sessao) ? 'Aberta' : 'Encerrada' }}</td>
+        <td>
+          <button class="btn-primary" [routerLink]="['/sessoes', sessao.id]" *ngIf="isSessaoAberta(sessao)">Editar</button>
+          <button class="btn-danger" (click)="deleteSessao(sessao.id)">Excluir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!sessoes.length && !isLoading" class="no-data">Nenhuma sessão encontrada</div>
+</div>

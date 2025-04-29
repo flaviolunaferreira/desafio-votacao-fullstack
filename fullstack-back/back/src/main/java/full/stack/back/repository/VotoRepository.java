@@ -6,12 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface VotoRepository extends JpaRepository<Voto, Long> {
 
-    @Query("SELECT COUNT(v) > 0 FROM Voto v WHERE v.sessaoVotacao = :sessaoVotacao AND v.associadoCpf = :cpf")
-    boolean existsBySessaoVotacaoAndAssociadoCpf(Long sessaoVotacao, String cpf);
+    boolean existsByAssociadoCpfAndSessaoVotacaoId(String cpf, Long sessaoId);
 
     List<Voto> findBySessaoVotacao_Id(Long sessaoVotacao);
     long countBySessaoVotacao_Id(Long sessaoVotacao);
@@ -27,7 +25,7 @@ public interface VotoRepository extends JpaRepository<Voto, Long> {
 
     @Query(value = "SELECT " +
             "CASE :granularidade " +
-            "  WHEN 'DIA' THEN DATE(v.data_voto) " +
+            "  WHEN 'DIA' THEN CAST(DATE(v.data_voto) AS DATETIME) " +
             "  WHEN 'SEMANA' THEN DATE_FORMAT(v.data_voto, '%Y-%U') " +
             "  WHEN 'MES' THEN DATE_FORMAT(v.data_voto, '%Y-%m') " +
             "END AS periodo, " +
@@ -39,8 +37,7 @@ public interface VotoRepository extends JpaRepository<Voto, Long> {
             "ORDER BY periodo", nativeQuery = true)
     List<Object[]> countVotosByPeriodo(LocalDateTime inicio, LocalDateTime fim, String granularidade);
 
-    Voto findByassociadoCpf(String cpf);
+    Voto findByAssociadoCpf(String cpf);
 
-    boolean existsByAssociadoCpfAndSessaoVotacaoId(String cpf, Long sessaoId);
 
 }

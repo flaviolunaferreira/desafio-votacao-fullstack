@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { DynamicCrudComponent, DynamicTableConfig } from '../../../shared/dynamic-crud/dynamic-crud.component';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PautaService } from '../../../services/pauta.service';
 import { PautaRequestDTO, PautaResponseDTO } from '../../../models/pauta.model';
 import { ApiError } from '../../../models/api-error.model';
@@ -10,73 +9,43 @@ import { ApiError } from '../../../models/api-error.model';
 @Component({
   selector: 'app-pauta-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    DynamicCrudComponent
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './pauta-form.component.html',
   styleUrls: ['./pauta-form.component.scss']
 })
 export class PautaFormComponent implements OnInit {
-  pauta: PautaRequestDTO | PautaResponseDTO = { titulo: '', descricao: '' };
+  pautaForm!: ReturnType<FormBuilder['group']>;
   isLoading = false;
   error: string | null = null;
   isEditMode = false;
-
-  config: DynamicTableConfig = {
-    title: 'Gerenciar Pauta',
-    fields: [
-      {
-        name: 'titulo',
-        label: 'Título',
-        type: 'input',
-        dataType: 'string',
-        required: true,
-        maxLength: 100,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      },
-      {
-        name: 'descricao',
-        label: 'Descrição',
-        type: 'textarea',
-        dataType: 'string',
-        required: true,
-        maxLength: 500,
-        showInTable: false,
-        filterable: false,
-        disabled: false
-      }
-    ],
-    actions: {
-      view: false,
-      edit: false,
-      delete: false
-    }
-  };
+  pautaId: number | null = null;
 
   constructor(
+    private fb: FormBuilder,
     private pautaService: PautaService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEditMode = true;
-      this.loadPauta(+id);
-    }
+  this.pautaForm = this.fb.group({
+    titulo: ['', [Validators.required, Validators.maxLength(100)]],
+    descricao: ['', [Validators.required, Validators.maxLength(500)]]
+  });
+
+  const id = this.route.snapshot.paramMap.get('id');
+  if (id) {
+    this.isEditMode = true;
+    this.pautaId = +id;
+    this.loadPauta(this.pautaId);
+  }
   }
 
   loadPauta(id: number): void {
     this.isLoading = true;
     this.pautaService.getById(id).subscribe({
       next: (pauta: PautaResponseDTO) => {
-        this.pauta = pauta;
+        this.pautaForm.patchValue(pauta);
         this.isLoading = false;
       },
       error: (err: ApiError) => {
@@ -86,11 +55,14 @@ export class PautaFormComponent implements OnInit {
     });
   }
 
-  savePauta(data: PautaRequestDTO): void {
+  savePauta(): void {
+    if (this.pautaForm.invalid) return;
     this.isLoading = true;
-    const action = this.isEditMode && (this.pauta as PautaResponseDTO).id
-      ? this.pautaService.update((this.pauta as PautaResponseDTO).id, data)
-      : this.pautaService.create(data);
+    const pautaData: PautaRequestDTO = this.pautaForm.value as PautaRequestDTO;
+
+    const action = this.isEditMode && this.pautaId
+      ? this.pautaService.update(this.pautaId, pautaData)
+      : this.pautaService.create(pautaData);
 
     action.subscribe({
       next: () => {
@@ -102,5 +74,9 @@ export class PautaFormComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  cancel(): void {
+    this.router.navigate(['/pautas']);
   }
 }

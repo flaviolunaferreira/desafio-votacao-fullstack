@@ -62,7 +62,7 @@ class SessaoVotacaoServiceImplTest {
     @Test
     void abrirSessao_pautaExistenteSemSessao_duracaoInformada_retornaSessao() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(null);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(null);
         when(sessaoVotacaoRepository.save(any(SessaoVotacao.class))).thenReturn(sessao);
 
         SessaoVotacaoResponseDTO response = sessaoVotacaoService.abrirSessao(requestDTO);
@@ -72,7 +72,7 @@ class SessaoVotacaoServiceImplTest {
         assertEquals(1L, response.getPautaId());
         assertEquals(now.plusMinutes(10), response.getDataFechamento());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verify(sessaoVotacaoRepository).save(any(SessaoVotacao.class));
     }
 
@@ -81,7 +81,7 @@ class SessaoVotacaoServiceImplTest {
         requestDTO.setDuracao(null);
         sessao.setDataFechamento(now.plusMinutes(1));
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(null);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(null);
         when(sessaoVotacaoRepository.save(any(SessaoVotacao.class))).thenReturn(sessao);
 
         SessaoVotacaoResponseDTO response = sessaoVotacaoService.abrirSessao(requestDTO);
@@ -91,7 +91,7 @@ class SessaoVotacaoServiceImplTest {
         assertEquals(1L, response.getPautaId());
         assertEquals(now.plusMinutes(1), response.getDataFechamento());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verify(sessaoVotacaoRepository).save(any(SessaoVotacao.class));
     }
 
@@ -100,7 +100,7 @@ class SessaoVotacaoServiceImplTest {
         requestDTO.setDuracao(0);
         sessao.setDataFechamento(now.plusMinutes(1));
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(null);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(null);
         when(sessaoVotacaoRepository.save(any(SessaoVotacao.class))).thenReturn(sessao);
 
         SessaoVotacaoResponseDTO response = sessaoVotacaoService.abrirSessao(requestDTO);
@@ -110,7 +110,7 @@ class SessaoVotacaoServiceImplTest {
         assertEquals(1L, response.getPautaId());
         assertEquals(now.plusMinutes(1), response.getDataFechamento());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verify(sessaoVotacaoRepository).save(any(SessaoVotacao.class));
     }
 
@@ -129,14 +129,14 @@ class SessaoVotacaoServiceImplTest {
     @Test
     void abrirSessao_sessaoJaAberta_lancaBusinessException() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(new SessaoVotacao());
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(new SessaoVotacao());
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> sessaoVotacaoService.abrirSessao(requestDTO));
 
         assertEquals("Já existe uma sessão de votação aberta para a pauta: 1", exception.getMessage());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verifyNoMoreInteractions(sessaoVotacaoRepository);
     }
 

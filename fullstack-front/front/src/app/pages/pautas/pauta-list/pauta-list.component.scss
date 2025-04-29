@@ -1,13 +1,7 @@
-/* src/app/pages/pautas/pauta-list/pauta-list.component.scss */
-:host {
-  display: block;
-  padding: 20px;
-  background: var(--background-dark);
-  color: var(--text-light);
+.container-dark {
+  max-width: 1200px;
 }
 
-app-dynamic-crud {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+button {
+  margin: 5px;
 }

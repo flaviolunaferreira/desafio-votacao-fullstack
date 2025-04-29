@@ -79,8 +79,8 @@ class VotoServiceImplTest {
     @Test
     void votar_pautaValidaSessaoAbertaCpfValidoNaoVotado_retornaVoto() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
-        when(votoRepository.existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735")).thenReturn(false);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
+        when(votoRepository.existsByAssociadoCpfAndSessaoVotacaoId("11144477735", 1L)).thenReturn(false);
         when(votoRepository.save(any(Voto.class))).thenReturn(voto);
 
         VotoResponseDTO response = votoService.votar(requestDTO);
@@ -91,8 +91,8 @@ class VotoServiceImplTest {
         assertEquals("11144477735", response.getAssociadoCpf());
         assertTrue(response.getVoto());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
-        verify(votoRepository).existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735");
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
+        verify(votoRepository).existsByAssociadoCpfAndSessaoVotacaoId("11144477735", 1L);
         verify(votoRepository).save(any(Voto.class));
     }
 
@@ -122,14 +122,14 @@ class VotoServiceImplTest {
     @Test
     void votar_sessaoNaoExistente_lancaBusinessException() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(null);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(null);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.votar(requestDTO));
 
         assertEquals("Nenhuma sessão de votação aberta para a pauta: 1", exception.getMessage());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verifyNoInteractions(votoRepository);
     }
 
@@ -137,30 +137,30 @@ class VotoServiceImplTest {
     void votar_sessaoFechada_lancaBusinessException() {
         sessao.setDataFechamento(now.minusMinutes(1));
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.votar(requestDTO));
 
         assertEquals("Sessão de votação encerrada para a pauta: 1", exception.getMessage());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verifyNoInteractions(votoRepository);
     }
 
     @Test
     void votar_usuarioJaVotou_lancaBusinessException() {
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
-        when(votoRepository.existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735")).thenReturn(true);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
+        when(votoRepository.existsByAssociadoCpfAndSessaoVotacaoId("11144477735", 1L)).thenReturn(true);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.votar(requestDTO));
 
         assertEquals("Associado com CPF 11144477735 já votou na pauta: 1", exception.getMessage());
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
-        verify(votoRepository).existsBySessaoVotacaoAndAssociadoCpf(1L, "11144477735");
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
+        verify(votoRepository).existsByAssociadoCpfAndSessaoVotacaoId("11144477735", 1L);
         verifyNoMoreInteractions(votoRepository);
     }
 
@@ -241,7 +241,7 @@ class VotoServiceImplTest {
         requestDTO.setVoto(false);
         when(votoRepository.findById(1L)).thenReturn(Optional.of(voto));
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
         when(votoRepository.save(any(Voto.class))).thenReturn(voto);
 
         VotoResponseDTO response = votoService.atualizarVoto(1L, requestDTO);
@@ -253,7 +253,7 @@ class VotoServiceImplTest {
         assertFalse(response.getVoto());
         verify(votoRepository).findById(1L);
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verify(votoRepository).save(any(Voto.class));
     }
 
@@ -285,7 +285,7 @@ class VotoServiceImplTest {
         sessao.setDataFechamento(now.minusMinutes(1));
         when(votoRepository.findById(1L)).thenReturn(Optional.of(voto));
         when(pautaRepository.findById(1L)).thenReturn(Optional.of(pauta));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.atualizarVoto(1L, requestDTO));
@@ -293,19 +293,19 @@ class VotoServiceImplTest {
         assertEquals("Sessão de votação encerrada para a pauta: 1", exception.getMessage());
         verify(votoRepository).findById(1L);
         verify(pautaRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verifyNoMoreInteractions(votoRepository);
     }
 
     @Test
     void deletarVoto_votoExistenteSessaoAberta_deletaVoto() {
         when(votoRepository.findById(1L)).thenReturn(Optional.of(voto));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
 
         votoService.deletarVoto(1L);
 
         verify(votoRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verify(votoRepository).deleteById(1L);
     }
 
@@ -325,14 +325,14 @@ class VotoServiceImplTest {
     void deletarVoto_sessaoFechada_lancaBusinessException() {
         sessao.setDataFechamento(now.minusMinutes(1));
         when(votoRepository.findById(1L)).thenReturn(Optional.of(voto));
-        when(sessaoVotacaoRepository.findByPautaId(1L)).thenReturn(sessao);
+        when(sessaoVotacaoRepository.findOpenByPautaId(1L)).thenReturn(sessao);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> votoService.deletarVoto(1L));
 
         assertEquals("Não é possível deletar voto após o encerramento da sessão", exception.getMessage());
         verify(votoRepository).findById(1L);
-        verify(sessaoVotacaoRepository).findByPautaId(1L);
+        verify(sessaoVotacaoRepository).findOpenByPautaId(1L);
         verifyNoMoreInteractions(votoRepository);
     }
 

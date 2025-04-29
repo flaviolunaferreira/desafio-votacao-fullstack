@@ -11,4 +11,6 @@ public class SessaoVotacaoRequestDTO {
 
     @Positive(message = "A duração deve ser um número positivo")
     private Integer duracao; // Em minutos
+
+
 }
