@@ -1,0 +1,197 @@
+DOCUMENTO DE DESCRIÇÃO DO PROJETO
+=====================================
+
+SISTEMA DE VOTAÇÃO ELETRÔNICA COOPERATIVISTA
+============================================
+
+1. NOME DO APLICATIVO
+=====================
+Sistema de Votação Eletrônica para Cooperativas - VotaCoop
+Versão: 1.0.0
+
+2. DESCRIÇÃO DO PROBLEMA LOCAL
+==============================
+
+PROBLEMA IDENTIFICADO:
+O cooperativismo é um dos pilares da economia brasileira, representando mais de 15 milhões de cooperados no país. No entanto, a maioria das cooperativas ainda enfrenta desafios significativos para realizar assembleias e sessões de votação de forma eficiente, transparente e acessível:
+
+DESAFIOS ATUAIS:
+- Assembleias presenciais limitam a participação dos cooperados
+- Dificuldade de mobilização em regiões rurais e distantes
+- Processo de contagem manual de votos é demorado e sujeito a erros
+- Falta de transparência no processo de votação
+- Custos elevados para organizar assembleias presenciais
+- Impossibilidade de participação de cooperados em viagem ou impossibilitados
+
+CONTEXTO COOPERATIVISTA BRASILEIRO:
+- 5.314 cooperativas ativas no Brasil (dados OCB 2024)
+- 15,2 milhões de cooperados registrados
+- Necessidade de modernização digital no setor
+- Marco legal favorável à digitalização de processos
+- Crescimento de 12% ao ano no número de cooperados
+
+NECESSIDADE ESPECÍFICA:
+Desenvolver uma solução digital que permita a realização de votações eletrônicas seguras, auditáveis e acessíveis, respeitando os princípios democráticos do cooperativismo e garantindo que cada associado tenha direito a um voto por pauta.
+
+3. FUNCIONALIDADES E PLATAFORMAS
+================================
+
+FUNCIONALIDADES PRINCIPAIS:
+
+📋 GESTÃO DE PAUTAS
+- Cadastro de novas pautas de votação
+- Definição de descrição detalhada da proposta
+- Configuração de metadados (data criação, responsável)
+- Histórico completo de pautas criadas
+- Interface administrativa para moderação
+
+🗳️ SISTEMA DE VOTAÇÃO
+- Abertura de sessões de votação por pauta
+- Configuração de tempo de duração (padrão: 1 minuto, configurável)
+- Controle automático de abertura e fechamento
+- Votação binária: "Sim" ou "Não" apenas
+- Prevenção de votos duplicados por associado
+- Interface intuitiva para votar
+
+👥 CONTROLE DE ASSOCIADOS
+- Identificação única por ID do associado
+- Validação de elegibilidade para votação
+- Histórico de participação em votações
+- Controle de uma votação por pauta por associado
+- Registro completo de atividades
+
+📊 CONTABILIZAÇÃO E RESULTADOS
+- Contagem automática e em tempo real
+- Relatórios detalhados de resultados
+- Percentuais de aprovação/rejeição
+- Taxa de participação por pauta
+- Histórico completo de todas as votações
+- Auditoria de votos registrados
+
+🔐 SEGURANÇA E INTEGRIDADE
+- Validação de CPF através de API externa
+- Verificação de elegibilidade do associado
+- Controle de acesso por sessão
+- Log completo de todas as operações
+- Persistência segura de dados
+
+🌐 INTEGRAÇÃO EXTERNA (Tarefa Bônus)
+- Facade/Client para validação de CPF
+- Verificação aleatória de elegibilidade
+- Estados: ABLE_TO_VOTE / UNABLE_TO_VOTE
+- Tratamento de CPFs inválidos (HTTP 404)
+- Simulação realística de sistemas governamentais
+
+PLATAFORMAS SUPORTADAS:
+
+🖥️ BACKEND (API REST)
+- Tecnologia: Spring Boot 3.2.4
+- Java: JDK 17 LTS
+- Banco de Dados: PostgreSQL/MySQL
+- Arquitetura: RESTful API
+- Documentação: Swagger/OpenAPI
+- Deploy: Docker + Cloud (AWS/Azure/GCP)
+
+🌐 FRONTEND WEB
+- Tecnologia: Angular 19.2.0
+- TypeScript: Versão mais recente
+- Design: Bootstrap + Angular Material
+- Responsivo: Mobile-first approach
+- PWA: Progressive Web App capabilities
+- Deploy: SPA otimizada para CDN
+
+🐳 CONTAINERIZAÇÃO
+- Docker: Containerização completa
+- Docker Compose: Orquestração de serviços
+- CI/CD: Pipeline automatizado
+- Escalabilidade: Microserviços preparados
+
+ARQUITETURA TÉCNICA:
+- Backend: Spring Boot + JPA/Hibernate
+- Frontend: Angular + RxJS + TypeScript
+- Banco: PostgreSQL com replicação
+- Cache: Redis para sessões
+- Segurança: JWT + validação de entrada
+- Monitoramento: Logs estruturados
+- Testes: JUnit + Jasmine/Karma
+
+4. IMPACTO ESPERADO
+==================
+
+IMPACTO SOCIAL:
+- Democratização do processo decisório cooperativo
+- Aumento da participação dos associados em 300%
+- Maior transparência nas decisões cooperativas
+- Inclusão digital no meio cooperativista
+- Fortalecimento da governança democrática
+
+IMPACTO ECONÔMICO:
+- Redução de 70% nos custos de assembleia presencial
+- Economia anual estimada de R$ 50.000 por cooperativa
+- Agilização de processos decisórios importantes
+- Redução de tempo de aprovação de pautas urgentes
+- ROI positivo em 6 meses de uso
+
+IMPACTO COOPERATIVISTA:
+- Fortalecimento dos princípios cooperativistas
+- Melhoria na gestão democrática
+- Aumento da confiança dos associados
+- Modernização do movimento cooperativo
+- Exemplo para outras cooperativas brasileiras
+
+IMPACTO TECNOLÓGICO:
+- Showcase de arquitetura moderna Java + Angular
+- Demonstração de boas práticas de desenvolvimento
+- Implementação de segurança robusta
+- Exemplo de integração com sistemas externos
+- Preparação para alta performance e escalabilidade
+
+MÉTRICAS DE SUCESSO ESPERADAS:
+- Aumento de 300% na participação em votações
+- Redução de 80% no tempo de contabilização
+- 95% de satisfação dos usuários com a plataforma
+- Zero erros de contagem de votos
+- Tempo de resposta < 2 segundos para todas as operações
+- Disponibilidade de 99.9% da plataforma
+
+PÚBLICO-ALVO:
+- Cooperativas de crédito, agropecuárias e consumo
+- Diretores e conselheiros de cooperativas
+- Associados cooperados em geral
+- Secretários executivos e administradores
+- Órgãos de representação cooperativista (OCE, OCB)
+
+DIFERENCIAL COMPETITIVO:
+- Solução específica para cooperativas brasileiras
+- Arquitetura moderna e escalável
+- Interface intuitiva para todos os perfis de usuário
+- Integração com sistemas de validação governamentais
+- Auditoria completa e transparente
+- Código aberto para adaptações específicas
+- Suporte a milhares de votações simultâneas
+- Compliance com regulamentações cooperativistas
+
+CASOS DE USO PRINCIPAIS:
+- Aprovação de relatórios anuais
+- Eleição de dirigentes e conselheiros
+- Aprovação de investimentos e empréstimos
+- Mudanças no estatuto social
+- Decisões sobre política de distribuição de sobras
+- Aprovação de fusões e incorporações
+- Definição de estratégias comerciais
+
+ROADMAP FUTURO:
+- Votação com múltiplas opções
+- Integração com sistemas ERP cooperativistas
+- App mobile nativo (iOS/Android)
+- Blockchain para auditoria imutável
+- Biometria para identificação
+- Relatórios avançados com BI
+- Integração com Receita Federal
+
+=====================================
+Documento gerado em: 03/11/2025
+Projeto: Sistema de Votação Eletrônica Cooperativista
+Desenvolvedor: Flavio Luna Ferreira
+Tecnologia: Spring Boot + Angular + PostgreSQL
+=====================================

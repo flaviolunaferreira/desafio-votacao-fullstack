@@ -1,0 +1,193 @@
+ROTEIRO PARA VÍDEO EXPLICATIVO - SISTEMA DE VOTAÇÃO
+===================================================
+
+🎬 INFORMAÇÕES DO VÍDEO:
+- Duração: 4-5 minutos (máximo permitido)
+- Formato: Explicativo + Demonstração
+- Plataforma: YouTube (público ou não listado)
+
+📝 ESTRUTURA DO ROTEIRO:
+=======================
+
+⏱️ INTRODUÇÃO (30 segundos)
+===========================
+🎯 O QUE FALAR:
+"Olá! Eu sou [Seu Nome] e vou apresentar o VotaCoop - Sistema de Votação Eletrônica para Cooperativas.
+
+Este é um sistema completo que desenvolvi para modernizar o processo democrático das cooperativas brasileiras, usando Spring Boot no backend, Angular no frontend, e tecnologias modernas para garantir segurança e transparência nas votações."
+
+🎥 O QUE MOSTRAR:
+- Tela inicial do VotaCoop
+- Interface principal com logo
+- Menu de navegação
+- Mencionar tecnologias (Spring Boot + Angular)
+
+⏱️ PROBLEMA E CONTEXTO (45 segundos)
+===================================
+🎯 O QUE FALAR:
+"O cooperativismo representa mais de 15 milhões de brasileiros, mas as cooperativas ainda enfrentam grandes desafios para realizar assembleias eficientes.
+
+Assembleias presenciais limitam participação, especialmente em regiões rurais. A contagem manual é demorada e sujeita a erros, há falta de transparência, e custos elevados para organizar eventos.
+
+Minha solução digitaliza todo o processo, permitindo votações eletrônicas seguras, auditáveis e acessíveis, respeitando o princípio de um voto por associado."
+
+🎥 O QUE MOSTRAR:
+- Estatísticas do cooperativismo brasileiro
+- Tela de pautas mostrando diferentes status
+- Destacar segurança e transparência
+
+⏱️ GESTÃO DE PAUTAS (45 segundos)
+================================
+🎯 O QUE FALAR:
+"Vamos começar pela gestão de pautas. Aqui vemos três pautas típicas de uma cooperativa: uma aprovação de relatório anual que está aberta para votação, uma eleição de conselho fiscal agendada, e um investimento em tecnologia já finalizado.
+
+Cada pauta tem status claro, informações detalhadas, e para as ativas, um timer em tempo real mostrando quanto tempo resta para votar."
+
+🎥 O QUE MOSTRAR:
+- Navegar pela lista de pautas
+- Mostrar diferentes status (aberta, agendada, encerrada)
+- Destacar timer funcionando
+- Painel informativo com estatísticas
+- Navegação entre pautas
+
+⏱️ PROCESSO DE VOTAÇÃO (60 segundos)
+==================================
+🎯 O QUE FALAR:
+"O processo de votação é simples e seguro. O associado acessa a pauta ativa, lê as informações detalhadas - neste caso, sobre aprovação do relatório anual com balanço auditado e parecer do conselho fiscal.
+
+A identificação é feita por CPF e ID único do associado. O sistema valida elegibilidade através de API externa. As opções são claras: SIM ou NÃO apenas, seguindo o princípio cooperativista.
+
+Vou simular uma votação: insiro CPF, ID do associado, seleciono minha opção - observe que o botão confirmar só habilita após seleção - e confirmo. O sistema registra imediatamente e mostra confirmação."
+
+🎥 O QUE MOSTRAR:
+- Navegar para aba "Votar"
+- Mostrar detalhes da pauta
+- Preencher CPF: 123.456.789-00
+- Preencher ID: ASSOC001
+- Selecionar opção SIM ou NÃO
+- Clicar confirmar e mostrar modal de sucesso
+- Destacar timer funcionando
+
+⏱️ RESULTADOS E ANÁLISE (45 segundos)
+====================================
+🎯 O QUE FALAR:
+"Os resultados são contabilizados em tempo real. Aqui vemos a votação em andamento com 78% de aprovação e 22% de rejeição, baseado em 438 votos de 1.247 associados.
+
+O sistema gera gráficos interativos automaticamente, mostra barras de progresso visuais, e mantém histórico completo. Para pautas finalizadas, como este investimento em tecnologia, vemos que foi aprovado com 87% dos votos e 78% de participação.
+
+As estatísticas gerais mostram 12 pautas este ano, com 75% de aprovação média e participação média de 78%."
+
+🎥 O QUE MOSTRAR:
+- Navegar para aba "Resultados"
+- Mostrar gráficos funcionando (Chart.js)
+- Destacar números em tempo real
+- Barras de progresso animadas
+- Estatísticas do painel lateral
+- Histórico de votações
+
+⏱️ ADMINISTRAÇÃO (30 segundos)
+=============================
+🎯 O QUE FALAR:
+"O painel administrativo permite criar novas pautas com título, descrição e duração configurável. Administradores controlam abertura e fechamento de sessões, definem durações personalizadas, e gerenciam a base de 1.247 associados com 93% ativos na plataforma."
+
+🎥 O QUE MOSTRAR:
+- Navegar para aba "Admin"
+- Mostrar formulário de nova pauta
+- Controles de sessão
+- Gestão de associados
+- Destacar números da cooperativa
+
+⏱️ IMPACTO E CONCLUSÃO (30 segundos)
+==================================
+🎯 O QUE FALAR:
+"O impacto é transformador: aumento de 300% na participação, redução de 70% nos custos de assembleia, e 95% de satisfação dos usuários.
+
+O sistema fortalece a democracia cooperativa, moderniza processos decisórios, e serve de exemplo para as 5.314 cooperativas brasileiras. É minha contribuição para digitalizar e democratizar o cooperativismo nacional."
+
+🎥 O QUE MOSTRAR:
+- Dashboard final com estatísticas
+- Métricas de impacto
+- Logo VotaCoop final
+
+📋 CHECKLIST DE GRAVAÇÃO:
+========================
+[ ] Testar timer funcionando
+[ ] Verificar gráficos Chart.js carregados
+[ ] Preparar dados de exemplo realistas
+[ ] Cronometrar cada seção
+[ ] Praticar fluxo de votação completo
+[ ] Testar responsividade
+[ ] Verificar modal de confirmação
+
+🎬 DICAS DE GRAVAÇÃO:
+====================
+✅ TÉCNICAS:
+- Use gravador de tela (OBS, Camtasia, Loom)
+- Resolução mínima: 1280x720 (recomendado 1920x1080)
+- Taxa de quadros: 30 FPS
+- Áudio claro e sem ruído
+- Cursor destacado e visível
+
+✅ NARRATIVA:
+- Enfatize segurança e transparência
+- Use terminologia cooperativista correta
+- Destaque inovação e impacto social
+- Mantenha tom profissional e técnico
+- Fale sobre democracia e participação
+
+✅ DEMONSTRAÇÃO:
+- Simule votação completa
+- Mostre timer em funcionamento
+- Interaja com gráficos
+- Destaque diferentes estados das pautas
+- Mostre responsividade Bootstrap
+
+🎯 PONTOS OBRIGATÓRIOS:
+======================
+1. ✅ Nome: "Sistema de Votação Eletrônica para Cooperativas"
+2. ✅ Problema: Dificuldades em assembleias cooperativas
+3. ✅ Funcionalidades: Pautas, Votação, Resultados, Admin
+4. ✅ Plataformas: Spring Boot + Angular + PostgreSQL
+5. ✅ Impacto: Modernização do cooperativismo
+6. ✅ Segurança: Validação CPF, auditoria, transparência
+7. ✅ Escalabilidade: Preparado para milhares de votos
+
+🔧 FUNCIONALIDADES A DESTACAR:
+=============================
+- Timer em tempo real funcionando
+- Gráficos Chart.js interativos
+- Validação de CPF e elegibilidade
+- Estados visuais das pautas (badges)
+- Design Bootstrap responsivo
+- Modal de confirmação
+- Controle administrativo completo
+
+📺 PÓS-PRODUÇÃO:
+===============
+- Adicionar legendas técnicas
+- Destacar tecnologias usadas
+- Incluir termo "cooperativismo"
+- Thumbnail com logo VotaCoop
+- Tags: cooperativa, votação, spring boot, angular
+
+🔗 UPLOAD NO YOUTUBE:
+====================
+- Título: "VotaCoop - Sistema de Votação Eletrônica para Cooperativas"
+- Descrição: Incluir Spring Boot, Angular, cooperativismo
+- Visibilidade: Público ou Não listado
+- Categoria: Tecnologia ou Educação
+
+💡 DIFERENCIAIS A MENCIONAR:
+===========================
+- Específico para cooperativas brasileiras
+- Arquitetura moderna e escalável
+- Integração com sistemas externos
+- Auditoria completa e transparente
+- Preparado para alta performance
+- Compliance cooperativista
+
+===================================================
+Roteiro criado em: 03/11/2025
+Projeto: Sistema de Votação Eletrônica Cooperativista
+Desenvolvedor: Flavio Luna Ferreira
+===================================================

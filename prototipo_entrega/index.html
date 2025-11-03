@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VotaCoop - Sistema de Votação Cooperativista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 10px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .vote-option {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        .vote-option:hover {
+            border-color: var(--primary-color);
+            background: rgba(13, 110, 253, 0.05);
+            transform: scale(1.02);
+        }
+
+        .vote-option.selected {
+            border-color: var(--success-color);
+            background: rgba(25, 135, 84, 0.1);
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+        }
+
+        .status-badge {
+            font-size: 0.9em;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .header-title {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .voting-session-timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--danger-color);
+        }
+
+        .result-chart {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="main-container p-4">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="header-title display-4">
+                    <i class="bi bi-vote-fill"></i> VotaCoop
+                </h1>
+                <p class="lead text-muted">Sistema de Votação Eletrônica para Cooperativas</p>
+                <p class="text-muted">Democracia digital, transparência total</p>
+            </div>
+
+            <!-- Navigation -->
+            <ul class="nav nav-pills justify-content-center mb-4" id="mainTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="pautas-tab" data-section="pautas">
+                        <i class="bi bi-list-ul"></i> Pautas
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="votar-tab" data-section="votar">
+                        <i class="bi bi-hand-thumbs-up"></i> Votar
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="resultados-tab" data-section="resultados">
+                        <i class="bi bi-graph-up"></i> Resultados
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="admin-tab" data-section="admin">
+                        <i class="bi bi-gear"></i> Admin
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Content Sections -->
+            
+            <!-- Seção Pautas -->
+            <div id="pautas-section" class="content-section">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3><i class="bi bi-list-check"></i> Pautas Disponíveis</h3>
+                        <div class="pauta-list">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title">Aprovação do Relatório Anual 2024</h5>
+                                            <p class="card-text">Aprovação dos demonstrativos financeiros e relatório de atividades do exercício 2024 da cooperativa.</p>
+                                            <small class="text-muted">Criada em: 01/11/2025</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-success status-badge">Aberta</span>
+                                            <div class="mt-2">
+                                                <small class="voting-session-timer">
+                                                    <i class="bi bi-clock"></i> Tempo restante: 45:32
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title">Eleição do Conselho Fiscal</h5>
+                                            <p class="card-text">Eleição dos membros do conselho fiscal para o biênio 2025-2026.</p>
+                                            <small class="text-muted">Criada em: 30/10/2025</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning status-badge">Agendada</span>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Início: 05/11/2025 14:00</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title">Aprovação de Investimento em Tecnologia</h5>
+                                            <p class="card-text">Aprovação do investimento de R$ 2.500.000 em modernização de sistemas e infraestrutura tecnológica.</p>
+                                            <small class="text-muted">Criada em: 29/10/2025</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-secondary status-badge">Encerrada</span>
+                                            <div class="mt-2">
+                                                <small class="text-success">
+                                                    <i class="bi bi-check-circle"></i> Aprovada (87% Sim)
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-info-circle"></i> Informações</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Total de Associados:</strong> 1.247</p>
+                                <p><strong>Pautas Ativas:</strong> 1</p>
+                                <p><strong>Próxima Votação:</strong> 05/11/2025</p>
+                                <p><strong>Participação Média:</strong> 78%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Votar -->
+            <div id="votar-section" class="content-section" style="display: none;">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header text-center">
+                                <h4><i class="bi bi-ballot"></i> Votação em Andamento</h4>
+                                <div class="voting-session-timer">
+                                    <i class="bi bi-clock"></i> Tempo restante: 45:32
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="mb-4">Aprovação do Relatório Anual 2024</h5>
+                                <p class="mb-4">Você aprova os demonstrativos financeiros e relatório de atividades do exercício 2024 da cooperativa?</p>
+                                
+                                <div class="mb-4">
+                                    <h6>Detalhes da Pauta:</h6>
+                                    <ul>
+                                        <li>Balanço patrimonial auditado</li>
+                                        <li>Demonstração de resultado do exercício</li>
+                                        <li>Relatório de atividades sociais</li>
+                                        <li>Parecer do conselho fiscal</li>
+                                    </ul>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="vote-option" data-vote="sim">
+                                            <i class="bi bi-hand-thumbs-up text-success" style="font-size: 3em;"></i>
+                                            <h4 class="text-success mt-2">SIM</h4>
+                                            <p>Aprovar o relatório</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="vote-option" data-vote="nao">
+                                            <i class="bi bi-hand-thumbs-down text-danger" style="font-size: 3em;"></i>
+                                            <h4 class="text-danger mt-2">NÃO</h4>
+                                            <p>Rejeitar o relatório</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-primary btn-lg" id="confirmarVoto" disabled>
+                                        <i class="bi bi-check-circle"></i> Confirmar Voto
+                                    </button>
+                                </div>
+
+                                <div class="mt-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6><i class="bi bi-person-badge"></i> Identificação do Associado</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="cpfAssociado" class="form-label">CPF:</label>
+                                                    <input type="text" class="form-control" id="cpfAssociado" placeholder="000.000.000-00" maxlength="14">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="idAssociado" class="form-label">ID do Associado:</label>
+                                                    <input type="text" class="form-control" id="idAssociado" placeholder="ID único">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Resultados -->
+            <div id="resultados-section" class="content-section" style="display: none;">
+                <h3><i class="bi bi-graph-up"></i> Resultados das Votações</h3>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Aprovação do Relatório Anual 2024 - Em Andamento</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Votos SIM</span>
+                                                <span>342 votos (78%)</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" style="width: 78%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Votos NÃO</span>
+                                                <span>96 votos (22%)</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-danger" style="width: 22%"></div>
+                                            </div>
+                                        </div>
+                                        <p><strong>Total de Votos:</strong> 438 de 1.247 associados (35%)</p>
+                                        <p><strong>Status:</strong> <span class="badge bg-warning">Votação em Andamento</span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="result-chart">
+                                            <canvas id="chartResultado1" width="200" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Aprovação de Investimento em Tecnologia - Finalizada</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Votos SIM</span>
+                                                <span>847 votos (87%)</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" style="width: 87%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Votos NÃO</span>
+                                                <span>126 votos (13%)</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-danger" style="width: 13%"></div>
+                                            </div>
+                                        </div>
+                                        <p><strong>Total de Votos:</strong> 973 de 1.247 associados (78%)</p>
+                                        <p><strong>Status:</strong> <span class="badge bg-success">Aprovada</span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="result-chart">
+                                            <canvas id="chartResultado2" width="200" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-bar-chart"></i> Estatísticas Gerais</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Pautas este ano:</strong> 12</p>
+                                <p><strong>Aprovadas:</strong> 9 (75%)</p>
+                                <p><strong>Rejeitadas:</strong> 2 (17%)</p>
+                                <p><strong>Em andamento:</strong> 1 (8%)</p>
+                                <hr>
+                                <p><strong>Participação média:</strong> 78%</p>
+                                <p><strong>Maior participação:</strong> 94%</p>
+                                <p><strong>Menor participação:</strong> 52%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Admin -->
+            <div id="admin-section" class="content-section" style="display: none;">
+                <h3><i class="bi bi-gear"></i> Administração</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-plus-circle"></i> Nova Pauta</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="novaPautaForm">
+                                    <div class="mb-3">
+                                        <label for="tituloPauta" class="form-label">Título da Pauta:</label>
+                                        <input type="text" class="form-control" id="tituloPauta" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="descricaoPauta" class="form-label">Descrição:</label>
+                                        <textarea class="form-control" id="descricaoPauta" rows="3" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="dataInicio" class="form-label">Data/Hora de Início:</label>
+                                        <input type="datetime-local" class="form-control" id="dataInicio">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="duracaoVotacao" class="form-label">Duração (minutos):</label>
+                                        <input type="number" class="form-control" id="duracaoVotacao" value="60" min="1">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-plus"></i> Criar Pauta
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="bi bi-play-circle"></i> Controle de Sessões</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="pautaParaAbrir" class="form-label">Pauta para Abrir:</label>
+                                    <select class="form-select" id="pautaParaAbrir">
+                                        <option value="">Selecione uma pauta</option>
+                                        <option value="2">Eleição do Conselho Fiscal</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="duracaoSessao" class="form-label">Duração da Sessão (minutos):</label>
+                                    <input type="number" class="form-control" id="duracaoSessao" value="60" min="1">
+                                </div>
+                                <button class="btn btn-success" id="abrirSessao">
+                                    <i class="bi bi-play"></i> Abrir Sessão de Votação
+                                </button>
+                                <button class="btn btn-danger ms-2" id="fecharSessao">
+                                    <i class="bi bi-stop"></i> Fechar Sessão Atual
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="bi bi-people"></i> Gestão de Associados</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Total de Associados:</strong> 1.247</p>
+                                <p><strong>Ativos na plataforma:</strong> 1.156 (93%)</p>
+                                <button class="btn btn-outline-primary">
+                                    <i class="bi bi-upload"></i> Importar Lista
+                                </button>
+                                <button class="btn btn-outline-success ms-2">
+                                    <i class="bi bi-download"></i> Exportar Dados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div class="modal fade" id="sucessoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-check-circle text-success"></i> Voto Registrado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Seu voto foi registrado com sucesso!</p>
+                    <p><strong>Pauta:</strong> Aprovação do Relatório Anual 2024</p>
+                    <p><strong>Voto:</strong> <span id="votoRegistrado"></span></p>
+                    <p><strong>Data/Hora:</strong> <span id="dataVoto"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="votacao.js"></script>
+</body>
+</html>

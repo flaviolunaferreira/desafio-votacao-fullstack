@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+    springdoc:
+      packages-to-scan: full.stack.back
+      paths-to-match: /**
