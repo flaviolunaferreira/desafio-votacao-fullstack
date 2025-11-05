@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: votacao-frontend
+    ports:
+      - "4200:4200"
+    restart: unless-stopped
+    depends_on:
+      - backend-check
+    networks:
+      - frontend-network
+
+  # Serviço para verificar se o backend está disponível
+  backend-check:
+    image: curlimages/curl:latest
+    container_name: backend-health-check
+    command: >
+      sh -c "
+        echo 'Verificando se backend está disponível...'
+        until curl -f http://host.docker.internal:8080/actuator/health || curl -f http://host.docker.internal:8080/api/v1/dashboard/estatisticas; do
+          echo 'Backend não disponível, aguardando...'
+          sleep 5
+        done
+        echo 'Backend disponível!'
+      "
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge
